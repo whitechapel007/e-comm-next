@@ -39,9 +39,7 @@ export default function Hero() {
                   Shop new arrivals
                 </a>
               </Button>
-              <Button variant="ghost" asChild>
-                <a href="/about">Our story</a>
-              </Button>
+              <Button variant="ghost">Our story</Button>
             </div>
           </motion.div>
 

@@ -14,13 +14,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import Link from "next/link";
-import { HamburgerIcon } from "lucide-react";
+import { Menu } from "lucide-react";
 
 const MoblieNav = ({ data }: { data: NavMenu }) => {
   return (
     <Sheet>
       <SheetTrigger asChild className="cursor-pointer">
-        <HamburgerIcon />
+        <Menu />
       </SheetTrigger>
 
       <SheetContent side="left" className="overflow-y-auto">
@@ -47,17 +47,18 @@ const MoblieNav = ({ data }: { data: NavMenu }) => {
                       {item.label}
                     </AccordionTrigger>
                     <AccordionContent className="px-2 text-balance border-l flex flex-col">
-                      {item.children.map((itemChild) => (
-                        <SheetClose
-                          key={itemChild.id}
-                          asChild
-                          className="w-fit py-2 text-base"
-                        >
-                          <Link href={itemChild.url ?? "/"}>
-                            {itemChild.label}
-                          </Link>
-                        </SheetClose>
-                      ))}
+                      {item.children &&
+                        item.children.map((itemChild) => (
+                          <SheetClose
+                            key={itemChild.id}
+                            asChild
+                            className="w-fit py-2 text-base"
+                          >
+                            <Link href={itemChild.url ?? "/"}>
+                              {itemChild.label}
+                            </Link>
+                          </SheetClose>
+                        ))}
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
