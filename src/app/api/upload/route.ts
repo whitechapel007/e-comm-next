@@ -28,7 +28,7 @@ export async function POST(req: Request) {
       (resolve, reject) => {
         cloudinary.uploader
           .upload_stream(
-            { resource_type: "auto", folder: "ecommerce-products" }, // Auto-detect image/video
+            { resource_type: "auto", folder: "ecommerce-products" },
             (error, result) => {
               if (error) reject(error);
               else resolve(result as CloudinaryUploadResult);
