@@ -13,21 +13,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import Image from "next/image";
 import Link from "next/link";
+import { HamburgerIcon } from "lucide-react";
 
 const MoblieNav = ({ data }: { data: NavMenu }) => {
   return (
     <Sheet>
       <SheetTrigger asChild className="cursor-pointer">
-        <Image
-          priority
-          src="/icons/menu.svg"
-          height={100}
-          width={100}
-          alt="menu"
-          className="max-w-[22px] max-h-[22px]"
-        />
+        <HamburgerIcon />
       </SheetTrigger>
 
       <SheetContent side="left" className="overflow-y-auto">
