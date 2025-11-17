@@ -69,7 +69,7 @@ export default function Hero() {
           >
             {/* In production replace with next/image for performance */}
             <Image
-              src="/images/header.jpg"
+              src="/images/model.jpg"
               alt="Model wearing brand clothing"
               className="w-full object-cover hover:scale-110 transition-all duration-500"
               loading="lazy"
@@ -85,7 +85,7 @@ export default function Hero() {
           >
             <div className="flex items-center gap-3">
               <Image
-                src="/images/pic1.png"
+                src="/images/t-shirt.jpg"
                 alt="preview"
                 className="w-14 h-14 object-cover rounded"
                 width={56}
