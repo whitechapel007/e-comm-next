@@ -25,7 +25,6 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      // 1️⃣ Call your registration API
       const res = await fetch("/api/auth/register", {
         method: "POST",
         body: JSON.stringify({ name, email, password }),

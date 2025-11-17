@@ -101,7 +101,12 @@ export default function LoginPage() {
             className="w-full flex items-center justify-center gap-2 mb-4"
             onClick={() => signIn("google", { callbackUrl: "/" })}
           >
-            <Image src="/google.png" alt="google icon" width={20} height={20} />
+            <Image
+              src="/images/google.png"
+              alt="google icon"
+              width={20}
+              height={20}
+            />
             {/* Lucide icon */}
             <span>Sign in with Google</span>
           </Button>
