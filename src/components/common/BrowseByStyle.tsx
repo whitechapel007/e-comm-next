@@ -41,9 +41,12 @@ const styles = [
 export default function BrowseByStyle() {
   return (
     <section className="max-w-7xl mx-auto px-4 py-14">
-      <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-8 tracking-tight">
-        Browse By Dress Style
+      <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-3 tracking-tight">
+        Dress your moment
       </h2>
+      <p className="text-center text-slate-500 mb-8 max-w-xl mx-auto text-sm sm:text-base">
+        From Akoka to every occasion — find the look that tells your story.
+      </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {styles.map((style) => (
           <motion.div

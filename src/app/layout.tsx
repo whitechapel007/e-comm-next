@@ -18,8 +18,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VFH Store — Fashion & Style",
-  description: "Shop men's & women's clothing, bags, and accessories at VFH Store.",
+  title: "Eboya Boi — Fashion Tailored Beyond Ordinary | Akoka, Lagos",
+  description:
+    "Kaftans, Agbadas, shirts, 2-pieces & casualwears tailored beyond ordinary. Rediscover your fashion story with Eboya Boi, Akoka Lagos Nigeria.",
 };
 
 export default function RootLayout({

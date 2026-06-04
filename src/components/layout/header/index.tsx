@@ -102,7 +102,7 @@ const Navbar = () => {
   return (
     <nav className={`sticky top-0 z-20 transition-all duration-300 ${scrolled ? "bg-white/70 backdrop-blur-md shadow-sm" : ""}`}>
       <div className="flex relative max-w-7xl mx-auto items-center justify-between md:justify-start py-5 md:py-6 px-4 xl:px-0">
-        <Image src="/images/logo.png" alt="" width={100} height={100} />
+        <Image src="/images/logo.png" alt="Eboya Boi Fashion Hub" width={100} height={100} />
 
         <div className="block md:hidden mr-4">
           <MoblieNav data={filteredData} />

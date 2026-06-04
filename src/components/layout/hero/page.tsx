@@ -8,13 +8,23 @@ export default function Hero() {
     <motion.section>
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center py-16">
         <div className="space-y-6">
+          <motion.p
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="text-sm font-semibold uppercase tracking-widest text-slate-500"
+          >
+            Akoka, Lagos Nigeria
+          </motion.p>
+
           <motion.h1
             initial={{ x: -30, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.15 }}
             className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight"
           >
-            Quiet luxury. Loud character.
+            Style in every{" "}
+            <span className="italic font-serif font-normal">thread.</span>
           </motion.h1>
 
           <motion.p
@@ -23,8 +33,8 @@ export default function Hero() {
             transition={{ delay: 0.25 }}
             className="max-w-xl text-base sm:text-lg text-slate-600"
           >
-            Curated wardrobe staples, sustainably produced and thoughtfully
-            designed — pieces that last beyond the season.
+            Kaftans, Agbadas, shirts, 2-pieces & casualwears — tailored beyond
+            ordinary at Eboya Boi. Rediscover your fashion story today.
           </motion.p>
 
           <motion.div
@@ -33,17 +43,19 @@ export default function Hero() {
             transition={{ delay: 0.35 }}
           >
             <div className="flex gap-3">
-              <Button asChild>
-                <Link href="/shop">Shop new arrivals</Link>
+              <Button asChild size="lg">
+                <Link href="/shop">Shop the collection</Link>
               </Button>
-              <Button variant="ghost">Our story</Button>
+              <Button variant="outline" size="lg" asChild>
+                <Link href="/shop?category=clothing">Our styles</Link>
+              </Button>
             </div>
           </motion.div>
 
-          <div className="mt-6 flex gap-4 flex-wrap text-sm text-slate-500">
-            <span>Free shipping over ₦25,000</span>
-            <span>30-day returns</span>
-            <span>Sustainably sourced</span>
+          <div className="mt-6 flex gap-6 flex-wrap text-sm text-slate-500">
+            <span>📍 Akoka, Lagos</span>
+            <span>✂️ Tailored to order</span>
+            <span>🎨 Custom colours & sizes</span>
           </div>
         </div>
 
@@ -57,11 +69,24 @@ export default function Hero() {
           >
             <Image
               src="/images/model.jpg"
-              alt="Model wearing brand clothing"
+              alt="Eboya Boi — fashion tailored beyond ordinary"
               className="w-full object-cover hover:scale-110 transition-all duration-500"
               priority
               fill
             />
+          </motion.div>
+
+          {/* Brand badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            whileHover={{ y: -4 }}
+            className="absolute bottom-6 left-6 bg-white/95 backdrop-blur rounded-xl px-4 py-3 shadow-md"
+          >
+            <p className="text-xs text-slate-500 uppercase tracking-wide">Est. Akoka Lagos</p>
+            <p className="font-bold text-base leading-tight">Eboya Boi</p>
+            <p className="text-xs text-slate-500">Fashion Hub</p>
           </motion.div>
         </div>
       </div>

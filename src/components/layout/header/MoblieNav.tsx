@@ -25,8 +25,8 @@ const MoblieNav = ({ data }: { data: NavMenu }) => {
 
       <SheetContent side="left" className="overflow-y-auto">
         <SheetHeader className="">
-          <Link href="/" className="text-2xl">
-            VFH
+          <Link href="/" className="text-xl font-bold tracking-tight">
+            Eboya Boi
           </Link>
         </SheetHeader>
         <div className="flex flex-col items-start p-4">

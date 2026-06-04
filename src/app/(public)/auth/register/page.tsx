@@ -63,7 +63,11 @@ export default function RegisterPage() {
     <div className="flex items-center justify-center min-h-screen px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-center">Create Account</CardTitle>
+          <div className="text-center space-y-1">
+            <p className="text-xs uppercase tracking-widest text-slate-400">Join</p>
+            <CardTitle className="text-2xl font-bold">Eboya Boi</CardTitle>
+            <p className="text-sm text-slate-500">Create your account to start shopping</p>
+          </div>
         </CardHeader>
 
         <CardContent>

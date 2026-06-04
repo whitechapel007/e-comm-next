@@ -55,7 +55,13 @@ export default function LoginPage() {
     <div className="flex items-center justify-center min-h-screen px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-center">Login</CardTitle>
+          <div className="text-center space-y-1">
+            <p className="text-xs uppercase tracking-widest text-slate-400">
+              Welcome back to
+            </p>
+            <CardTitle className="text-2xl font-bold">Eboya Boi</CardTitle>
+            <p className="text-sm text-slate-500">Sign in to your account</p>
+          </div>
         </CardHeader>
 
         <CardContent>
@@ -96,20 +102,6 @@ export default function LoginPage() {
           <Separator className="my-6" />
 
           {/* GOOGLE LOGIN */}
-          <Button
-            variant="outline"
-            className="w-full flex items-center justify-center gap-2 mb-4"
-            onClick={() => signIn("google", { callbackUrl: "/" })}
-          >
-            <Image
-              src="/images/google.png"
-              alt="google icon"
-              width={20}
-              height={20}
-            />
-            {/* Lucide icon */}
-            <span>Sign in with Google</span>
-          </Button>
 
           {/* Link to register */}
           <p className="text-center text-sm text-gray-500">
