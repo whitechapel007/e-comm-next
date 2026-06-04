@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import ProductForm, {
   ProductFormValues,
 } from "@/app/admin/products/components/ProductForm";
@@ -11,7 +12,15 @@ interface EditProductPageProps {
   readonly params: { readonly id: string };
 }
 
-function mapProductToFormValues(product: any): ProductFormValues {
+type ProductWithRelations = Prisma.ProductGetPayload<{
+  include: {
+    images: true;
+    colorVariants: { include: { images: true } };
+    sizes: true;
+  };
+}>;
+
+function mapProductToFormValues(product: ProductWithRelations): ProductFormValues {
   return {
     name: product.name,
     description: product.description,
@@ -25,14 +34,13 @@ function mapProductToFormValues(product: any): ProductFormValues {
       product.images?.map((image: { url: string }) => ({ url: image.url })) ??
       [],
     colorVariants:
-      product.colorVariants?.map((variant: any) => ({
+      product.colorVariants?.map((variant) => ({
         colorName: variant.colorName,
         colorCode: variant.colorCode,
         price: variant.price,
         inStock: variant.inStock,
         images:
-          variant.images?.map((img: { url: string }) => ({ url: img.url })) ??
-          [],
+          variant.images?.map((img) => ({ url: img.url })) ?? [],
       })) ?? [],
     sizes:
       product.sizes?.map(
