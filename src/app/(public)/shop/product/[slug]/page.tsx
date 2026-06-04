@@ -37,6 +37,7 @@ export default async function ProductPage({
     include: {
       images: true,
       colorVariants: { include: { images: true } },
+      sizes: true,
     },
   });
 

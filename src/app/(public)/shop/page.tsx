@@ -93,6 +93,7 @@ export default async function ShopPage({ searchParams }: Readonly<ShopPageProps>
       include: {
         images: true,
         colorVariants: { include: { images: true } },
+        sizes: true,
       },
       skip,
       take: pageSize,

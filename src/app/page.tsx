@@ -9,11 +9,11 @@ const Home = async () => {
   const [topSellingProducts, newArrivals, latestReviews] = await Promise.all([
     prisma.product.findMany({
       where: { isTopSelling: true },
-      include: { images: true, colorVariants: { include: { images: true } } },
+      include: { images: true, colorVariants: { include: { images: true } }, sizes: true },
     }),
     prisma.product.findMany({
       where: { isNewArrival: true },
-      include: { images: true, colorVariants: { include: { images: true } } },
+      include: { images: true, colorVariants: { include: { images: true } }, sizes: true },
     }),
     prisma.review.findMany({
       take: 8,
