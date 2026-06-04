@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma migrate deploy && next build --turbopack",
+    "build": "prisma db execute --file ./prisma/migrations/20260604000000_update_categories/migration.sql --schema ./prisma/schema.prisma && next build --turbopack",
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate"
