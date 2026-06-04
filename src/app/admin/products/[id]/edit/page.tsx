@@ -20,7 +20,9 @@ type ProductWithRelations = Prisma.ProductGetPayload<{
   };
 }>;
 
-function mapProductToFormValues(product: ProductWithRelations): ProductFormValues {
+function mapProductToFormValues(
+  product: ProductWithRelations,
+): ProductFormValues {
   return {
     name: product.name,
     description: product.description,
@@ -39,8 +41,7 @@ function mapProductToFormValues(product: ProductWithRelations): ProductFormValue
         colorCode: variant.colorCode,
         price: variant.price,
         inStock: variant.inStock,
-        images:
-          variant.images?.map((img) => ({ url: img.url })) ?? [],
+        images: variant.images?.map((img) => ({ url: img.url })) ?? [],
       })) ?? [],
     sizes:
       product.sizes?.map(
