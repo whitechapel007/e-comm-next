@@ -15,6 +15,46 @@ const VALID_STATUSES = [
 
 type OrderStatus = (typeof VALID_STATUSES)[number];
 
+// GET /api/admin/orders/[id]
+// Admin can fetch any user's orders; the customer can only fetch their own.
+// [id] is treated as a userId here.
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Params }
+) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id: userId } = await params;
+
+  // Admins can see any user's orders; customers only their own
+  if (session.user.role !== "ADMIN" && session.user.id !== userId) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  try {
+    const orders = await prisma.order.findMany({
+      where: { userId },
+      include: {
+        orderItems: {
+          include: { product: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return NextResponse.json(orders);
+  } catch (err) {
+    console.error("GET orders by userId:", err);
+    return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 });
+  }
+}
+
+// PATCH /api/admin/orders/[id]
+// Admin only — updates the status of a specific order.
+// [id] is the order ID here.
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Params }
