@@ -21,11 +21,12 @@ interface ShopPageProps {
   searchParams: Promise<SearchParams>;
 }
 
-const categoryMap: Record<string, "SHOES" | "BAGS" | "CLOTHING" | "ACCESSORIES"> = {
-  shoes: "SHOES",
-  bags: "BAGS",
-  clothing: "CLOTHING",
-  accessories: "ACCESSORIES",
+const categoryMap: Record<string, "KAFTAN" | "AGBADA" | "SHIRTS" | "TWO_PIECE" | "CASUALWEAR"> = {
+  kaftan:     "KAFTAN",
+  agbada:     "AGBADA",
+  shirts:     "SHIRTS",
+  two_piece:  "TWO_PIECE",
+  casualwear: "CASUALWEAR",
 };
 
 function scalar(v: string | string[] | undefined): string | undefined {
@@ -109,7 +110,7 @@ export default async function ShopPage({ searchParams }: Readonly<ShopPageProps>
 
         <div className="flex flex-col md:flex-row gap-6 md:gap-8 mt-6">
           {/* Sidebar */}
-          <aside className="hidden md:flex flex-col min-w-[300px] max-w-[300px] border border-black/10 rounded-[20px] p-6 space-y-6 bg-gray-50">
+          <aside className="hidden md:flex flex-col min-w-75 max-w-75 border border-black/10 rounded-[20px] p-6 space-y-6 bg-gray-50">
             <h2 className="text-xl font-bold text-black">Filters</h2>
             <Filters />
           </aside>

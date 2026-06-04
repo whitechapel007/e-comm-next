@@ -1,4 +1,12 @@
-import { ProductType } from "../../../../types/product";
+import { ProductType, Category } from "../../../../types/product";
+
+const CATEGORY_LABELS: Record<Category, string> = {
+  KAFTAN:     "Kaftans",
+  AGBADA:     "Agbada",
+  SHIRTS:     "Shirts",
+  TWO_PIECE:  "2-Piece",
+  CASUALWEAR: "Casualwear",
+};
 
 interface Props {
   product: ProductType;
@@ -6,7 +14,7 @@ interface Props {
 
 const ProductDetailsContent = ({ product }: Readonly<Props>) => {
   const specs = [
-    { label: "Category", value: product.category },
+    { label: "Category", value: CATEGORY_LABELS[product.category] ?? product.category },
     { label: "Base price", value: `₦${product.basePrice.toLocaleString()}` },
     ...(product.discount ? [{ label: "Discount", value: `${product.discount}%` }] : []),
     ...(product.sizes && product.sizes.length > 0

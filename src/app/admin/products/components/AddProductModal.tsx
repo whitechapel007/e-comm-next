@@ -56,7 +56,7 @@ export default function AddProductModal({ onClose }: { onClose: () => void }) {
       basePrice: 0,
       prevPrice: undefined,
       discount: undefined,
-      category: "SHOES",
+      category: "KAFTAN",
       isNewArrival: false,
       isTopSelling: false,
       colorVariants: [],
@@ -142,10 +142,11 @@ export default function AddProductModal({ onClose }: { onClose: () => void }) {
                   {...register("category")}
                   className="w-full border rounded-md p-2"
                 >
-                  <option value="SHOES">Shoes</option>
-                  <option value="BAGS">Bags</option>
-                  <option value="CLOTHING">Clothing</option>
-                  <option value="ACCESSORIES">Accessories</option>
+                  <option value="KAFTAN">Kaftans</option>
+                  <option value="AGBADA">Agbada</option>
+                  <option value="SHIRTS">Shirts</option>
+                  <option value="TWO_PIECE">2-Piece</option>
+                  <option value="CASUALWEAR">Casualwear</option>
                 </select>
               </div>
             </div>

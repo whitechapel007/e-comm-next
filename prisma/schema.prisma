@@ -13,10 +13,11 @@ enum Role {
 }
 
 enum Category {
-  SHOES
-  BAGS
-  CLOTHING
-  ACCESSORIES
+  KAFTAN
+  AGBADA
+  SHIRTS
+  TWO_PIECE
+  CASUALWEAR
 }
 
 enum OrderStatus {

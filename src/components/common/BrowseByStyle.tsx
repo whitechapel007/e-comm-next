@@ -1,69 +1,73 @@
-// components/BrowseByStyle.tsx
 "use client";
 
-import { Card } from "@/components/ui/card";
-import { Shirt, PartyPopper, Dumbbell, Briefcase } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
-// Customize/extend this array for more styles!
-const styles = [
+const categories = [
   {
-    label: "Casual",
-    href: "/shop?style=casual",
-    icon: <Shirt size={44} className="text-blue-600 mb-2" />,
-    color: "bg-blue-50",
-    desc: "Relaxed fits for everyday essentials.",
+    label: "Kaftans",
+    href: "/shop?category=kaftan",
+    emoji: "👘",
+    bg: "bg-amber-50 border-amber-100",
+    desc: "Flowing fabrics, royal drape. Tailored for kings and queens.",
   },
   {
-    label: "Formal",
-    href: "/shop?style=formal",
-    icon: <Briefcase size={44} className="text-gray-700 mb-2" />,
-    color: "bg-gray-50",
-    desc: "Elegance for meetings, work, and events.",
+    label: "Agbada",
+    href: "/shop?category=agbada",
+    emoji: "🫅",
+    bg: "bg-stone-50 border-stone-100",
+    desc: "The pinnacle of Nigerian formal elegance — layered, grand, unforgettable.",
   },
   {
-    label: "Party",
-    href: "/shop?style=party",
-    icon: <PartyPopper size={44} className="text-fuchsia-500 mb-2" />,
-    color: "bg-fuchsia-50",
-    desc: "Stand out styles for night outs.",
+    label: "Shirts",
+    href: "/shop?category=shirts",
+    emoji: "👔",
+    bg: "bg-sky-50 border-sky-100",
+    desc: "Crisp, bespoke shirts cut for comfort and tailored to impress.",
   },
   {
-    label: "Gym",
-    href: "/shop?style=gym",
-    icon: <Dumbbell size={44} className="text-green-700 mb-2" />,
-    color: "bg-green-50",
-    desc: "Activewear for comfort and performance.",
+    label: "2-Piece",
+    href: "/shop?category=two_piece",
+    emoji: "✂️",
+    bg: "bg-rose-50 border-rose-100",
+    desc: "Perfectly matched sets — wear them together, turn every head.",
+  },
+  {
+    label: "Casualwear",
+    href: "/shop?category=casualwear",
+    emoji: "👕",
+    bg: "bg-green-50 border-green-100",
+    desc: "Effortless everyday style, still sewn with that Eboya Boi touch.",
   },
 ];
 
 export default function BrowseByStyle() {
   return (
     <section className="max-w-7xl mx-auto px-4 py-14">
-      <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-3 tracking-tight">
-        Dress your moment
-      </h2>
-      <p className="text-center text-slate-500 mb-8 max-w-xl mx-auto text-sm sm:text-base">
-        From Akoka to every occasion — find the look that tells your story.
+      <p className="text-xs uppercase tracking-widest text-slate-400 text-center mb-2">
+        What we make
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-        {styles.map((style) => (
+      <h2 className="text-3xl md:text-4xl font-extrabold text-center mb-3 tracking-tight">
+        Browse the collection
+      </h2>
+      <p className="text-center text-slate-500 mb-10 max-w-xl mx-auto text-sm sm:text-base">
+        Every piece is cut, sewn, and finished in Akoka, Lagos — tailored beyond ordinary.
+      </p>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        {categories.map((cat) => (
           <motion.div
-            key={style.label}
-            whileHover={{ scale: 1.07, y: -6 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            key={cat.label}
+            whileHover={{ scale: 1.04, y: -4 }}
+            transition={{ type: "spring", stiffness: 320, damping: 22 }}
           >
-            <Link href={style.href} className="block">
-              <Card
-                className={`flex flex-col items-center justify-center p-6 rounded-xl shadow ${style.color} cursor-pointer transition`}
-              >
-                {style.icon}
-                <div className="text-xl font-semibold ">{style.label}</div>
-                <div className="text-sm text-gray-500 text-center">
-                  {style.desc}
-                </div>
-              </Card>
+            <Link
+              href={cat.href}
+              className={`flex flex-col items-center text-center p-6 rounded-2xl border ${cat.bg} cursor-pointer transition-shadow hover:shadow-md h-full`}
+            >
+              <span className="text-4xl mb-3">{cat.emoji}</span>
+              <p className="font-bold text-lg mb-1">{cat.label}</p>
+              <p className="text-sm text-gray-500 leading-snug">{cat.desc}</p>
             </Link>
           </motion.div>
         ))}

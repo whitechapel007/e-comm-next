@@ -5,17 +5,12 @@ import CategoriesSection from "./CategoriesSection";
 import ColorsSection from "./ColorsSection";
 import PriceSection from "./PriceSection";
 import SizeSection from "./SizeSection";
-import DressStyleSection from "./DressStyle";
 import { Button } from "@/components/ui/button";
 import { useRouter, usePathname } from "next/navigation";
 
 const Filters = () => {
-  const router = useRouter();
+  const router   = useRouter();
   const pathname = usePathname();
-
-  const handleClearFilters = () => {
-    router.push(pathname);
-  };
 
   return (
     <div className="flex flex-col space-y-6">
@@ -27,12 +22,10 @@ const Filters = () => {
       <Separator />
       <SizeSection />
       <Separator />
-      <DressStyleSection />
-      <Separator />
       <Button
         type="button"
         className="bg-black w-full rounded-full text-sm font-medium py-4 h-12"
-        onClick={handleClearFilters}
+        onClick={() => router.push(pathname)}
       >
         Clear Filters
       </Button>

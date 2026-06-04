@@ -28,10 +28,12 @@ export default function Footer() {
         <div>
           <h2 className="mb-4 text-lg font-semibold">Shop</h2>
           <ul className="space-y-2 text-gray-300 text-sm">
-            <li><Link href="/shop?category=clothing" className="hover:text-white transition-colors">Kaftans &amp; Agbadas</Link></li>
-            <li><Link href="/shop?category=clothing" className="hover:text-white transition-colors">Shirts &amp; 2-Pieces</Link></li>
-            <li><Link href="/shop?category=clothing" className="hover:text-white transition-colors">Casualwear</Link></li>
-            <li><Link href="/shop" className="hover:text-white transition-colors">All Collections</Link></li>
+            <li><Link href="/shop?category=kaftan"     className="hover:text-white transition-colors">Kaftans</Link></li>
+            <li><Link href="/shop?category=agbada"     className="hover:text-white transition-colors">Agbada</Link></li>
+            <li><Link href="/shop?category=shirts"     className="hover:text-white transition-colors">Shirts</Link></li>
+            <li><Link href="/shop?category=two_piece"  className="hover:text-white transition-colors">2-Piece</Link></li>
+            <li><Link href="/shop?category=casualwear" className="hover:text-white transition-colors">Casualwear</Link></li>
+            <li><Link href="/shop"                     className="hover:text-white transition-colors">All Collections</Link></li>
           </ul>
         </div>
 

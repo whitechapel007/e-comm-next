@@ -11,10 +11,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const categoriesData = [
-  { title: "Clothing", slug: "clothing" },
-  { title: "Shoes", slug: "shoes" },
-  { title: "Bags", slug: "bags" },
-  { title: "Accessories", slug: "accessories" },
+  { title: "Kaftans",    slug: "kaftan"     },
+  { title: "Agbada",     slug: "agbada"     },
+  { title: "Shirts",     slug: "shirts"     },
+  { title: "2-Piece",    slug: "two_piece"  },
+  { title: "Casualwear", slug: "casualwear" },
 ];
 
 const CategoriesSection = () => {

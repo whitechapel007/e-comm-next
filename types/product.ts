@@ -1,4 +1,4 @@
-export type Category = "SHOES" | "BAGS" | "CLOTHING" | "ACCESSORIES";
+export type Category = "KAFTAN" | "AGBADA" | "SHIRTS" | "TWO_PIECE" | "CASUALWEAR";
 
 export interface ColorVariantImage {
   id: string;

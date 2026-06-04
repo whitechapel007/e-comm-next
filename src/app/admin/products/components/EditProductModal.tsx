@@ -194,10 +194,11 @@ export default function EditProductModal({
               <div>
                 <Label>Category</Label>
                 <select {...register("category" as const)} className="w-full border rounded-md p-2 h-10">
-                  <option value="SHOES">Shoes</option>
-                  <option value="BAGS">Bags</option>
-                  <option value="CLOTHING">Clothing</option>
-                  <option value="ACCESSORIES">Accessories</option>
+                  <option value="KAFTAN">Kaftans</option>
+                  <option value="AGBADA">Agbada</option>
+                  <option value="SHIRTS">Shirts</option>
+                  <option value="TWO_PIECE">2-Piece</option>
+                  <option value="CASUALWEAR">Casualwear</option>
                 </select>
               </div>
             </div>

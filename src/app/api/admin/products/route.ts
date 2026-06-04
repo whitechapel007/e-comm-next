@@ -44,7 +44,7 @@ const productSchema = z.object({
                    .transform((v) => (v != null ? Number.parseFloat(String(v)) : null)),
   discount:      z.union([z.string(), z.number()]).optional().nullable()
                    .transform((v) => (v != null ? Number.parseFloat(String(v)) : null)),
-  category:      z.enum(["SHOES", "BAGS", "CLOTHING", "ACCESSORIES"]),
+  category:      z.enum(["KAFTAN", "AGBADA", "SHIRTS", "TWO_PIECE", "CASUALWEAR"]),
   isTopSelling:  z.boolean().default(false),
   isNewArrival:  z.boolean().default(false),
   images:        z.array(z.object({ url: z.string().url() })).default([]),

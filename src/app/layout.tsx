@@ -18,9 +18,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Eboya Boi — Fashion Tailored Beyond Ordinary | Akoka, Lagos",
+  title: {
+    default: "Eboya Boi — Kaftans, Agbada, Shirts & More | Akoka, Lagos",
+    template: "%s | Eboya Boi",
+  },
   description:
-    "Kaftans, Agbadas, shirts, 2-pieces & casualwears tailored beyond ordinary. Rediscover your fashion story with Eboya Boi, Akoka Lagos Nigeria.",
+    "Shop Kaftans, Agbada, Shirts, 2-Piece sets & Casualwear tailored beyond ordinary. Rediscover your fashion story with Eboya Boi — Akoka, Lagos Nigeria.",
+  keywords: ["Kaftan", "Agbada", "Nigerian fashion", "Akoka", "Lagos", "tailored clothes", "2-piece", "casualwear", "Eboya Boi"],
 };
 
 export default function RootLayout({
