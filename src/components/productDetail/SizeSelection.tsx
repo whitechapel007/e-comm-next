@@ -20,9 +20,9 @@ const SizeSelection = ({ data }: { data: Product }) => {
         Choose Size
       </span>
       <div className="flex flex-wrap gap-2 lg:gap-3">
-        {data.sizes?.map((size, index) => (
+        {data.sizes?.map((size) => (
           <button
-            key={index}
+            key={size.id}
             type="button"
             aria-pressed={selectedSize === size.name}
             onClick={() => handleSizeChange(size.name)}

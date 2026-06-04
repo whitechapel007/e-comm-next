@@ -7,22 +7,23 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import ProductTable from "./components/ProductTable";
 import AddProductModal from "./components/AddProductModal";
+import { ProductType } from "../../../../types/product";
+
+interface ProductsResponse {
+  products: ProductType[];
+  totalPages: number;
+  totalCount: number;
+  page: number;
+}
 
 export default function AdminProductsPage() {
   const [addProductModalOpen, setAddProductModalOpen] = useState(false);
-
   const [page, setPage] = useState(1);
   const limit = 10;
-
   const queryClient = useQueryClient();
 
-  const {
-    data: products,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["admin-products"],
+  const { data, isLoading, isError, error } = useQuery<ProductsResponse>({
+    queryKey: ["admin-products", page],
     queryFn: async () => {
       const res = await axios.get("/api/admin/products", {
         params: { page, limit },
@@ -31,9 +32,9 @@ export default function AdminProductsPage() {
     },
   });
 
-  // Handle empty state
-  const isEmpty = !isLoading && products?.length === 0;
-  const totalPages = products?.totalPages ?? 1;
+  const products = data?.products ?? [];
+  const isEmpty = !isLoading && products.length === 0;
+  const totalPages = data?.totalPages ?? 1;
 
   return (
     <div className="max-w-5xl mx-auto p-6">
@@ -55,7 +56,7 @@ export default function AdminProductsPage() {
       {/* Error state */}
       {isError && (
         <p className="text-center mt-10 text-red-600">
-          {(error as Error).message || "Failed to load products"}
+          {error instanceof Error ? error.message : "Failed to load products"}
         </p>
       )}
 
@@ -67,7 +68,7 @@ export default function AdminProductsPage() {
       )}
 
       {/* Product table */}
-      {products && products.length > 0 && (
+      {products.length > 0 && (
         <ProductTable
           products={products}
           page={page}

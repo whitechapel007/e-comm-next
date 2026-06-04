@@ -13,6 +13,13 @@ export async function POST(req: Request) {
       );
     }
 
+    if (password.length < 8) {
+      return NextResponse.json(
+        { error: "Password must be at least 8 characters" },
+        { status: 400 }
+      );
+    }
+
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -24,7 +31,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const hashedPassword = await hash(password, 10);
+    const hashedPassword = await hash(password, 12);
 
     await prisma.user.create({
       data: {

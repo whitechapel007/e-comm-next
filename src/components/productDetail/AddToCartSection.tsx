@@ -5,12 +5,13 @@ import { addItem } from "@/store/cartSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/redux";
 import { RootState } from "@/store";
 import { ProductType } from "../../../types/product";
+import { toast } from "sonner";
 
-interface BuyNowBtnProps {
+interface AddToCartSectionProps {
   data: ProductType;
 }
 
-const BuyNowBtn = ({ data }: BuyNowBtnProps) => {
+const AddToCartSection = ({ data }: AddToCartSectionProps) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -18,39 +19,44 @@ const BuyNowBtn = ({ data }: BuyNowBtnProps) => {
     (state: RootState) => state.product
   );
 
-  // const isDisabled = !selectedSize || !selectedColor;
+  const buildCartItem = () => ({
+    productId: data.id,
+    name: data.name,
+    imageUrl: currentImage || data.images[0]?.url || "/placeholder.png",
+    price: selectedColor?.price ?? data.basePrice,
+    size: selectedSize ?? null,
+    color: selectedColor?.name ?? null,
+    discount: data.discount ?? null,
+  });
+
+  const handleAddToCart = () => {
+    dispatch(addItem(buildCartItem()));
+    toast.success(`${data.name} added to cart`);
+  };
 
   const handleBuyNow = () => {
-    // if (isDisabled) return;
-
-    // Add the item to cart
-    dispatch(
-      addItem({
-        productId: data.id,
-        name: data.name,
-        imageUrl: currentImage ?? "/placeholder.png",
-        price: selectedColor?.price ?? data.basePrice,
-        size: selectedSize ?? null,
-        color: selectedColor?.name ?? null,
-        discount: data.discount ?? null,
-      })
-    );
-
-    // Redirect to checkout page
+    dispatch(addItem(buildCartItem()));
     router.push("/checkout");
   };
 
   return (
-    <button
-      type="button"
-      className={`w-full rounded-full h-11 md:h-[52px] text-sm sm:text-base font-medium transition-all bg-indigo-600 text-white hover:bg-indigo-700
-        disabled:bg-gray-300 disabled:cursor-not-allowed
-      `}
-      onClick={handleBuyNow}
-    >
-      Buy Now
-    </button>
+    <div className="flex flex-col sm:flex-row gap-3 w-full">
+      <button
+        type="button"
+        onClick={handleAddToCart}
+        className="flex-1 rounded-full h-11 md:h-[52px] text-sm sm:text-base font-medium transition-all border border-black bg-white text-black hover:bg-black hover:text-white"
+      >
+        Add to Cart
+      </button>
+      <button
+        type="button"
+        onClick={handleBuyNow}
+        className="flex-1 rounded-full h-11 md:h-[52px] text-sm sm:text-base font-medium transition-all bg-black text-white hover:bg-black/80"
+      >
+        Buy Now
+      </button>
+    </div>
   );
 };
 
-export default BuyNowBtn;
+export default AddToCartSection;

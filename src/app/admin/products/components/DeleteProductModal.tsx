@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 
 import { Loader2 } from "lucide-react";
 import axios from "axios";
+import { toast } from "sonner";
 
 interface DeleteProductModalProps {
   productId: string;
@@ -33,9 +34,11 @@ export default function DeleteProductModal({
     try {
       setLoading(true);
       await deleteProduct(productId);
+      toast.success("Product deleted successfully");
       onClose();
     } catch (error) {
       console.error("Failed to delete product:", error);
+      toast.error("Failed to delete product. Please try again.");
     } finally {
       setLoading(false);
     }

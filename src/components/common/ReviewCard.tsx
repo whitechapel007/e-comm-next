@@ -5,10 +5,10 @@ import { Review } from "../../../utils/mockData";
 import Image from "next/image";
 import RenderStars from "../ui/RenderStars";
 
-type ReviewCardProps = {
+type ReviewCardProps = Readonly<{
   data: Review;
   className?: string;
-};
+}>;
 
 export default function ReviewCard({ data, className }: ReviewCardProps) {
   return (
@@ -24,8 +24,8 @@ export default function ReviewCard({ data, className }: ReviewCardProps) {
             src={data.avatarUrl}
             alt={data.name}
             className="w-10 h-10 rounded-full object-cover border"
-            width={400}
-            height={400}
+            width={40}
+            height={40}
           />
         ) : (
           <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-400 text-lg select-none">

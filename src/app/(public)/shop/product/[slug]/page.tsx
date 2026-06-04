@@ -8,9 +8,9 @@ import AddToCartSection from "@/components/productDetail/AddToCartSection";
 
 export default async function ProductPage({
   params,
-}: {
+}: Readonly<{
   params: Promise<{ slug: string }>;
-}) {
+}>) {
   const { slug } = await params;
 
   // Fetch product data
@@ -47,11 +47,12 @@ export default async function ProductPage({
         <BreadcrumbComponent details={productData.slug} />
 
         <section className="relative grid grid-cols-1 lg:grid-cols-3 gap-8 my-8">
-          {/* Product Details */}
           <div className="lg:col-span-2">
             <ProductDetail data={productData} />
           </div>
         </section>
+        {/* pb for the mobile sticky bar */}
+        <div className="pb-24 lg:pb-0" />
 
         {/* Tabs Section */}
         <Tabs />

@@ -30,16 +30,18 @@ export default function OrdersPage() {
 
   const statusBadge = (status: string) => {
     switch (status) {
-      case "pending":
+      case "PENDING":
         return <span className="text-yellow-600 font-medium">Pending</span>;
-      case "shipped":
+      case "PROCESSING":
+        return <span className="text-orange-500 font-medium">Processing</span>;
+      case "SHIPPED":
         return <span className="text-blue-600 font-medium">Shipped</span>;
-      case "delivered":
+      case "DELIVERED":
         return <span className="text-green-600 font-medium">Delivered</span>;
-      case "cancelled":
+      case "CANCELLED":
         return <span className="text-red-600 font-medium">Cancelled</span>;
       default:
-        return <span className="text-gray-600 font-medium">{status}</span>;
+        return <span className="text-gray-600 font-medium capitalize">{status.toLowerCase()}</span>;
     }
   };
 
@@ -80,7 +82,7 @@ export default function OrdersPage() {
                     >
                       View
                     </Button>
-                    {order.status === "pending" && (
+                    {order.status === "PENDING" && (
                       <Button
                         size="sm"
                         variant="destructive"

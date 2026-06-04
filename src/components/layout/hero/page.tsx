@@ -1,7 +1,6 @@
 import Image from "next/image";
-
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-
 import * as motion from "framer-motion/client";
 
 export default function Hero() {
@@ -35,29 +34,20 @@ export default function Hero() {
           >
             <div className="flex gap-3">
               <Button asChild>
-                <a href="/shop" className="inline-flex items-center">
-                  Shop new arrivals
-                </a>
+                <Link href="/shop">Shop new arrivals</Link>
               </Button>
               <Button variant="ghost">Our story</Button>
             </div>
           </motion.div>
 
-          {/* small feature strip inspired by Everlane / Zara */}
           <div className="mt-6 flex gap-4 flex-wrap text-sm text-slate-500">
-            <span className="inline-flex items-center gap-2">
-              Free shipping over ₦25,000
-            </span>
-            <span className="inline-flex items-center gap-2">
-              30-day returns
-            </span>
-            <span className="inline-flex items-center gap-2">
-              Sustainably sourced
-            </span>
+            <span>Free shipping over ₦25,000</span>
+            <span>30-day returns</span>
+            <span>Sustainably sourced</span>
           </div>
         </div>
 
-        {/* Hero image / composition */}
+        {/* Hero image */}
         <div className="relative h-[420px] sm:h-[520px]">
           <motion.div
             initial={{ scale: 1.03 }}
@@ -65,37 +55,13 @@ export default function Hero() {
             transition={{ duration: 0.9 }}
             className="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl"
           >
-            {/* In production replace with next/image for performance */}
             <Image
               src="/images/model.jpg"
               alt="Model wearing brand clothing"
               className="w-full object-cover hover:scale-110 transition-all duration-500"
-              loading="lazy"
-              width={600}
-              height={600}
+              priority
+              fill
             />
-          </motion.div>
-
-          {/* floating product preview (micro-interaction) */}
-          <motion.div
-            whileHover={{ y: -6 }}
-            className="absolute bottom-6 left-6 bg-white/95 backdrop-blur rounded-xl p-3 shadow-md w-56"
-          >
-            <div className="flex items-center gap-3">
-              <Image
-                src="/images/t-shirt.jpg"
-                alt="preview"
-                className="w-14 h-14 object-cover rounded"
-                width={56}
-                height={56}
-              />
-              <div>
-                <div className="text-sm font-medium">
-                  T-shirt with Tape Details
-                </div>
-                <div className="text-xs text-slate-500">₦120</div>
-              </div>
-            </div>
           </motion.div>
         </div>
       </div>

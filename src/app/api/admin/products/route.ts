@@ -88,22 +88,36 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// Get all products (public)
-export async function GET() {
+// Get all products with pagination
+export async function GET(req: NextRequest) {
   try {
-    const products = await prisma.product.findMany({
-      include: {
-        colorVariants: { include: { images: true } },
-        sizes: true,
-        images: true,
-      },
-      orderBy: { createdAt: "desc" },
-    });
+    const { searchParams } = new URL(req.url);
+    const page = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") ?? "10")));
+    const skip = (page - 1) * limit;
 
-    return NextResponse.json(products);
+    const [products, totalCount] = await Promise.all([
+      prisma.product.findMany({
+        include: {
+          colorVariants: { include: { images: true } },
+          sizes: true,
+          images: true,
+        },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: limit,
+      }),
+      prisma.product.count(),
+    ]);
+
+    return NextResponse.json({
+      products,
+      totalCount,
+      totalPages: Math.ceil(totalCount / limit),
+      page,
+    });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Failed to fetch products";
+    const message = error instanceof Error ? error.message : "Failed to fetch products";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -68,12 +68,6 @@ export default function EditProductModal({
 
   const { control, register, handleSubmit, reset } = methods;
 
-  // Top-level images
-  const { append: appendTopImage } = useFieldArray({
-    control,
-    name: "images",
-  });
-
   // Color variants
   const {
     fields: variantFields,
@@ -177,7 +171,7 @@ export default function EditProductModal({
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Product Info */}
             <div className="grid grid-cols-2 gap-4">
-              <div>
+              <div className="col-span-2">
                 <Label>Name</Label>
                 <Input {...register("name" as const)} />
               </div>
@@ -192,6 +186,15 @@ export default function EditProductModal({
               <div>
                 <Label>Discount (%)</Label>
                 <Input type="number" {...register("discount" as const)} />
+              </div>
+              <div>
+                <Label>Category</Label>
+                <select {...register("category" as const)} className="w-full border rounded-md p-2 h-10">
+                  <option value="SHOES">Shoes</option>
+                  <option value="BAGS">Bags</option>
+                  <option value="CLOTHING">Clothing</option>
+                  <option value="ACCESSORIES">Accessories</option>
+                </select>
               </div>
             </div>
 
@@ -234,16 +237,7 @@ export default function EditProductModal({
 
             {/* Product Images */}
             <div>
-              <div className="flex justify-between items-center mb-3">
-                <Label className="text-lg font-semibold">Product Images</Label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => appendTopImage({ url: "" })}
-                >
-                  <Plus className="h-4 w-4 mr-1" /> Add Image
-                </Button>
-              </div>
+              <Label className="text-lg font-semibold">Product Images</Label>
               <ImageUploadField
                 name={`images`}
                 label="Product Images"
@@ -323,10 +317,15 @@ export default function EditProductModal({
                           {...register(`colorVariants.${index}.price` as const)}
                         />
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Switch
-                          {...register(
-                            `colorVariants.${index}.inStock` as const
+                      <div className="flex items-center space-x-2 mt-6">
+                        <Controller
+                          name={`colorVariants.${index}.inStock`}
+                          control={control}
+                          render={({ field }) => (
+                            <Switch
+                              checked={!!field.value}
+                              onCheckedChange={field.onChange}
+                            />
                           )}
                         />
                         <Label>In Stock</Label>

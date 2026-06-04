@@ -1,96 +1,44 @@
-// types/order.ts
-
 import { ProductType } from "./product";
 
-// --------------------------------------------------
-// Order Item
-// --------------------------------------------------
 export interface OrderItem {
   id: string;
-  product: ProductType;
+  orderId: string;
+  productId: string;
+  product: Pick<ProductType, "id" | "name" | "slug">;
   quantity: number;
-  selectedColor?: string;
-  selectedSize?: string;
-  price: number; // final price per item after discount
-  subtotal: number; // quantity * price
-  imageUrl?: string;
-  name: string;
+  colorName: string | null;
+  size: string | null;
+  price: number;
+  createdAt: string;
 }
 
-// --------------------------------------------------
-// Customer Info
-// --------------------------------------------------
-export interface CustomerInfo {
+export interface OrderUser {
   id: string;
-  name: string;
-
+  name: string | null;
   email: string;
-  phone?: string;
-  role?: "CUSTOMER" | "ADMIN";
 }
 
-// --------------------------------------------------
-// Shipping Details
-// --------------------------------------------------
-export interface ShippingAddress {
-  fullName: string;
-  phoneNumber: string;
-  addressLine1: string;
-  addressLine2?: string;
-  state: string;
-  city: string;
-  postalCode?: string;
-  country: string;
-}
-
-export interface ShippingInfo {
-  method: string; // e.g., "Standard", "Express"
-  cost: number;
-  address: ShippingAddress;
-}
-
-// --------------------------------------------------
-// Payment Details
-// --------------------------------------------------
-export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";
-
-export type PaymentMethod =
-  | "card"
-  | "bank_transfer"
-  | "pay_on_delivery"
-  | "wallet";
-
-// --------------------------------------------------
-// Order Status
-// --------------------------------------------------
 export type OrderStatus =
-  | "pending"
-  | "processing"
-  | "shipped"
-  | "delivered"
-  | "cancelled";
+  | "PENDING"
+  | "PROCESSING"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "CANCELLED"
+  | "INITIATION_FAILED";
 
-// --------------------------------------------------
-// Main Order Type
-// --------------------------------------------------
+export type PaymentStatus = "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
+
 export interface OrderType {
   id: string;
-  orderNumber: string;
+  userId: string;
+  user: OrderUser;
+  status: OrderStatus;
+  paymentStatus: PaymentStatus;
+  paymentRef: string | null;
+  totalAmount: number;
+  shippingAddress: string;
   phoneNumber: string;
   orderItems: OrderItem[];
-  user: CustomerInfo;
-
-  totalAmount: number;
-  subTotal: number;
-  shippingFee: number;
-  discountTotal?: number;
-
-  paymentStatus: PaymentStatus;
-  paymentMethod: PaymentMethod;
-
-  shippingAddress: string;
-  status: OrderStatus;
-
   createdAt: string;
-  updatedAt?: string;
+  updatedAt: string;
 }

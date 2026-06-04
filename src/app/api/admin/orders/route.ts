@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { nanoid } from "nanoid"; // to generate unique paymentRef
 
 interface OrderItemPayload {
   productId: string;
@@ -86,8 +85,11 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (err) {
-    if (err instanceof Error)
-      return NextResponse.json({ err }, { status: 500 });
+    console.error("Create order error:", err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Failed to create order" },
+      { status: 500 }
+    );
   }
 }
 
@@ -96,7 +98,9 @@ export async function GET() {
   try {
     const orders = await prisma.order.findMany({
       include: {
-        orderItems: true,
+        orderItems: {
+          include: { product: { select: { id: true, name: true, slug: true } } },
+        },
         user: { select: { id: true, name: true, email: true } },
       },
       orderBy: { createdAt: "desc" },
@@ -104,8 +108,10 @@ export async function GET() {
 
     return NextResponse.json({ orders }, { status: 200 });
   } catch (err) {
-    if (err instanceof Error) console.error("Get orders error:", err);
-
-    return NextResponse.json({ err }, { status: 500 });
+    console.error("Get orders error:", err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Failed to fetch orders" },
+      { status: 500 }
+    );
   }
 }

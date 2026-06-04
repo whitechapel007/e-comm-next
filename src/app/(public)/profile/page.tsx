@@ -1,22 +1,18 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
-  const router = useRouter();
 
   const user = session?.user;
 
-  // Redirect to login if not authenticated
-  if (status !== "loading" && !user) {
-    router.push("/auth/login");
-    return null;
-  }
+  if (status === "loading") return null;
+  if (!user) redirect("/auth/login");
 
   return (
     <div className="flex justify-center items-center min-h-screen py-12 px-4">
@@ -51,17 +47,9 @@ export default function ProfilePage() {
             <span className="text-gray-600">{user?.email}</span>
           </div>
 
-          <div className="pt-4 flex flex-col sm:flex-row gap-3">
+          <div className="pt-4">
             <Button
-              variant="outline"
-              className="flex-1"
-              onClick={() => router.push("/profile/edit")}
-            >
-              Edit Profile
-            </Button>
-
-            <Button
-              className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+              className="w-full bg-red-600 hover:bg-red-700 text-white"
               onClick={() => signOut({ callbackUrl: "/" })}
             >
               Sign Out

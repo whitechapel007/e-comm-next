@@ -94,9 +94,10 @@ export default function RegisterPage() {
               <div className="relative">
                 <Input
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
+                  placeholder="At least 8 characters"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  minLength={8}
                   required
                 />
                 <button
