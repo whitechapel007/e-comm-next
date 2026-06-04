@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { Prisma } from "@prisma/client";
+import { z } from "zod";
 
 type VariantPayload = {
   colorName: string;
@@ -11,6 +12,111 @@ type VariantPayload = {
   inStock: boolean;
   images?: { url: string }[];
 };
+
+type SizePayload = {
+  id?: string;
+  name: string;
+  quantity: string;
+};
+
+const urlString = z.string().refine(
+  (value) => {
+    try {
+      new URL(value);
+      return true;
+    } catch {
+      return false;
+    }
+  },
+  { message: "Invalid URL" },
+);
+
+const colorVariantSchema = z.object({
+  colorName: z.string().min(1),
+  colorCode: z.string().min(1),
+  price: z
+    .union([z.string(), z.number()])
+    .transform((value) => Number.parseFloat(String(value))),
+  inStock: z.boolean().default(true),
+  images: z.array(z.object({ url: urlString })).default([]),
+});
+
+const productUpdateSchema = z.object({
+  name: z.string().min(2),
+  description: z.string().min(10),
+  basePrice: z
+    .union([z.string(), z.number()])
+    .transform((value) => Number.parseFloat(String(value))),
+  prevPrice: z
+    .union([z.string(), z.number()])
+    .optional()
+    .nullable()
+    .transform((value) =>
+      value !== null && value !== undefined
+        ? Number.parseFloat(String(value))
+        : null,
+    ),
+  discount: z
+    .union([z.string(), z.number()])
+    .optional()
+    .nullable()
+    .transform((value) =>
+      value !== null && value !== undefined
+        ? Number.parseFloat(String(value))
+        : null,
+    ),
+  isTopSelling: z.boolean().default(false),
+  isNewArrival: z.boolean().default(false),
+  images: z.array(z.object({ url: urlString })).default([]),
+  colorVariants: z.array(colorVariantSchema).default([]),
+  sizes: z
+    .array(
+      z.object({
+        id: z.string().optional(),
+        name: z.string().min(1),
+        quantity: z.string().min(1),
+      }),
+    )
+    .default([]),
+});
+
+async function syncProductSizes(
+  tx: Prisma.TransactionClient,
+  productId: string,
+  sizes: SizePayload[],
+) {
+  const sizeIds = await Promise.all(
+    sizes.map(async (size) => {
+      if (size.id) {
+        await tx.size.update({
+          where: { id: size.id },
+          data: {
+            name: size.name,
+            quantity: size.quantity,
+          },
+        });
+        return size.id;
+      }
+
+      const createdSize = await tx.size.create({
+        data: {
+          name: size.name,
+          quantity: size.quantity,
+        },
+      });
+      return createdSize.id;
+    }),
+  );
+
+  await tx.product.update({
+    where: { id: productId },
+    data: {
+      sizes: {
+        set: sizeIds.map((id) => ({ id })),
+      },
+    },
+  });
+}
 
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
@@ -65,6 +171,43 @@ async function upsertColorVariants(
   }
 }
 
+// ── GET /api/admin/products/[id] ─────────────────────────────────────────────
+
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> },
+) {
+  const auth = await requireAdmin();
+  if ("error" in auth) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
+  }
+
+  const { id } = await context.params;
+
+  try {
+    const product = await prisma.product.findUnique({
+      where: { id },
+      include: {
+        images: true,
+        colorVariants: { include: { images: true } },
+        sizes: true,
+      },
+    });
+
+    if (!product) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(product);
+  } catch (error) {
+    console.error("GET /api/admin/products/[id]:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch product" },
+      { status: 500 },
+    );
+  }
+}
+
 // ── PUT /api/admin/products/[id] ─────────────────────────────────────────────
 
 export async function PUT(
@@ -79,6 +222,14 @@ export async function PUT(
   const { id } = await context.params;
 
   try {
+    const parsed = productUpdateSchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid product data", details: parsed.error.issues },
+        { status: 400 },
+      );
+    }
+
     const {
       name,
       description,
@@ -90,7 +241,7 @@ export async function PUT(
       images,
       colorVariants,
       sizes,
-    } = await req.json();
+    } = parsed.data;
 
     const product = await prisma.$transaction(async (tx) => {
       await tx.product.update({
@@ -98,9 +249,9 @@ export async function PUT(
         data: {
           name,
           description,
-          basePrice: Number.parseFloat(basePrice),
-          prevPrice: prevPrice ? Number.parseFloat(prevPrice) : null,
-          discount: discount ? Number.parseFloat(discount) : null,
+          basePrice,
+          prevPrice: prevPrice ?? null,
+          discount: discount ?? null,
           isTopSelling,
           isNewArrival,
         },
@@ -120,16 +271,9 @@ export async function PUT(
         await upsertColorVariants(tx, id, colorVariants);
       }
 
-      await tx.product.update({
-        where: { id },
-        data: {
-          sizes: {
-            set: sizes?.length
-              ? sizes.map(({ id: sid }: { id: string }) => ({ id: sid }))
-              : [],
-          },
-        },
-      });
+      if (sizes) {
+        await syncProductSizes(tx, id, sizes);
+      }
 
       return tx.product.findUnique({
         where: { id },
@@ -148,7 +292,10 @@ export async function PUT(
   } catch (error) {
     console.error("PUT /api/admin/products/[id]:", error);
     return NextResponse.json(
-      { error: "Failed to update product" },
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to update product",
+      },
       { status: 500 },
     );
   }

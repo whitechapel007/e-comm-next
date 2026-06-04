@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Search, RefreshCcw } from "lucide-react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import ProductTable from "./components/ProductTable";
-import AddProductModal from "./components/AddProductModal";
 import { ProductType } from "../../../../types/product";
 
 interface ProductsResponse {
@@ -18,7 +18,6 @@ interface ProductsResponse {
 }
 
 export default function AdminProductsPage() {
-  const [addProductModalOpen, setAddProductModalOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -86,8 +85,8 @@ export default function AdminProductsPage() {
             Refresh
           </Button>
 
-          <Button onClick={() => setAddProductModalOpen(true)}>
-            Add New Product
+          <Button variant="default" asChild>
+            <Link href="/admin/products/new">Add New Product</Link>
           </Button>
         </div>
       </div>
@@ -133,15 +132,6 @@ export default function AdminProductsPage() {
           page={page}
           totalPages={totalPages}
           onPageChange={setPage}
-        />
-      )}
-
-      {addProductModalOpen && (
-        <AddProductModal
-          onCloseAction={() => {
-            setAddProductModalOpen(false);
-            queryClient.invalidateQueries({ queryKey: ["admin-products"] });
-          }}
         />
       )}
     </div>

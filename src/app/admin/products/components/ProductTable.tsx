@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -11,7 +12,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import EditProductModal from "./EditProductModal";
 import DeleteProductModal from "./DeleteProductModal";
 import { ProductType } from "../../../../../types/product";
 
@@ -79,12 +79,10 @@ export default function ProductTable({
 
                   {/* Actions */}
                   <TableCell className="space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setSelectedProduct(product)}
-                    >
-                      Edit
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`/admin/products/${product.id}/edit`}>
+                        Edit
+                      </Link>
                     </Button>
                     <Button
                       variant="destructive"
@@ -133,14 +131,6 @@ export default function ProductTable({
           Next
         </Button>
       </div>
-
-      {/* Modals */}
-      {selectedProduct && !deleteModalOpen && (
-        <EditProductModal
-          product={selectedProduct}
-          onCloseAction={() => setSelectedProduct(null)}
-        />
-      )}
 
       {deleteModalOpen && selectedProduct && (
         <DeleteProductModal
