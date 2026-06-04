@@ -37,10 +37,10 @@ export interface ProductFormValues {
   name: string;
   description: string;
   basePrice: number;
-  prevPrice?: number;
+  prevPrice?: number | null;
   images?: { url: string }[];
-  discount?: number;
-  category: string;
+  discount?: number | null;
+  category: "KAFTAN" | "AGBADA" | "SHIRTS" | "TWO_PIECE" | "CASUALWEAR";
   isNewArrival: boolean;
   isTopSelling: boolean;
   colorVariants: ColorVariant[];
