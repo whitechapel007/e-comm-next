@@ -5,6 +5,15 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { z } from "zod";
 
+const urlString = z.string().refine((value) => {
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
+}, { message: "Invalid URL" });
+
 // ── Slug helpers ─────────────────────────────────────────────────────────────
 
 function baseSlug(name: string): string {
@@ -33,7 +42,7 @@ const colorVariantSchema = z.object({
   colorCode: z.string().min(1),
   price:     z.union([z.string(), z.number()]).transform((v) => Number.parseFloat(String(v))),
   inStock:   z.boolean().default(true),
-  images:    z.array(z.object({ url: z.string().url() })).default([]),
+  images:    z.array(z.object({ url: urlString })).default([]),
 });
 
 const productSchema = z.object({
@@ -41,13 +50,13 @@ const productSchema = z.object({
   description:   z.string().min(10, "Description is required"),
   basePrice:     z.union([z.string(), z.number()]).transform((v) => Number.parseFloat(String(v))),
   prevPrice:     z.union([z.string(), z.number()]).optional().nullable()
-                   .transform((v) => (v != null ? Number.parseFloat(String(v)) : null)),
+                   .transform((v) => (v !== null && v !== undefined ? Number.parseFloat(String(v)) : null)),
   discount:      z.union([z.string(), z.number()]).optional().nullable()
-                   .transform((v) => (v != null ? Number.parseFloat(String(v)) : null)),
+                   .transform((v) => (v !== null && v !== undefined ? Number.parseFloat(String(v)) : null)),
   category:      z.enum(["KAFTAN", "AGBADA", "SHIRTS", "TWO_PIECE", "CASUALWEAR"]),
   isTopSelling:  z.boolean().default(false),
   isNewArrival:  z.boolean().default(false),
-  images:        z.array(z.object({ url: z.string().url() })).default([]),
+  images:        z.array(z.object({ url: urlString })).default([]),
   colorVariants: z.array(colorVariantSchema).default([]),
   sizes:         z.array(z.object({ name: z.string().min(1), quantity: z.string() })).default([]),
 });
@@ -66,7 +75,7 @@ export async function POST(req: NextRequest) {
   const parsed = productSchema.safeParse(await req.json());
   if (!parsed.success) {
     return NextResponse.json(
-      { error: "Invalid product data", details: parsed.error.flatten() },
+      { error: "Invalid product data", details: parsed.error.issues },
       { status: 400 }
     );
   }
@@ -123,9 +132,20 @@ export async function GET(req: NextRequest) {
     const page  = Math.max(1, Number.parseInt(searchParams.get("page")  ?? "1"));
     const limit = Math.min(100, Math.max(1, Number.parseInt(searchParams.get("limit") ?? "10")));
     const skip  = (page - 1) * limit;
+    const search = searchParams.get("search")?.trim() ?? "";
+
+    const where = search
+      ? {
+          OR: [
+            { name: { contains: search, mode: "insensitive" as const } },
+            { description: { contains: search, mode: "insensitive" as const } },
+          ],
+        }
+      : undefined;
 
     const [products, totalCount] = await Promise.all([
       prisma.product.findMany({
+        where,
         include: {
           colorVariants: { include: { images: true } },
           sizes:  true,
@@ -135,7 +155,7 @@ export async function GET(req: NextRequest) {
         skip,
         take: limit,
       }),
-      prisma.product.count(),
+      prisma.product.count({ where }),
     ]);
 
     return NextResponse.json({
@@ -143,6 +163,7 @@ export async function GET(req: NextRequest) {
       totalCount,
       totalPages: Math.ceil(totalCount / limit),
       page,
+      search,
     });
   } catch (error) {
     return NextResponse.json(

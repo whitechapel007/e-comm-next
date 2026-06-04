@@ -7,6 +7,7 @@ import {
   FormProvider,
   Controller,
 } from "react-hook-form";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -46,7 +47,7 @@ export interface ProductFormValues {
   sizes: { name: string; quantity: string }[];
 }
 
-export default function AddProductModal({ onClose }: { onClose: () => void }) {
+export default function AddProductModal({ onCloseAction }: { readonly onCloseAction: () => void }) {
   const [loading, setLoading] = useState(false);
 
   const methods = useForm<ProductFormValues>({
@@ -86,19 +87,22 @@ export default function AddProductModal({ onClose }: { onClose: () => void }) {
     return data.url;
   };
 
+  const queryClient = useQueryClient();
+
   const onSubmit = async (data: ProductFormValues) => {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/products", {
-        method:  "POST",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify(data),
+        body: JSON.stringify(data),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Failed to add product");
       toast.success("Product added successfully");
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       reset();
-      onClose();
+      onCloseAction();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to add product");
     } finally {
@@ -107,7 +111,7 @@ export default function AddProductModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <Dialog open onOpenChange={onClose}>
+    <Dialog open onOpenChange={onCloseAction}>
       <DialogContent className="max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Product</DialogTitle>
@@ -278,7 +282,7 @@ export default function AddProductModal({ onClose }: { onClose: () => void }) {
 
             {/* Actions */}
             <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={onClose} type="button">
+              <Button variant="outline" onClick={onCloseAction} type="button">
                 Cancel
               </Button>
               <Button type="submit" disabled={loading}>

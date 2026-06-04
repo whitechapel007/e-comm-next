@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -13,28 +14,30 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface DeleteProductModalProps {
-  productId: string;
-  productName: string;
-  onClose: () => void;
+  readonly productId: string;
+  readonly productName: string;
+  readonly onCloseAction: () => void;
 }
 
 export default function DeleteProductModal({
   productId,
   productName,
-  onClose,
+  onCloseAction,
 }: DeleteProductModalProps) {
   const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleDelete = async () => {
     setLoading(true);
     try {
       const res = await fetch(`/api/admin/products/${productId}`, { method: "DELETE" });
+      const json = await res.json();
       if (!res.ok) {
-        const json = await res.json();
         throw new Error(json.error ?? "Failed to delete product");
       }
       toast.success("Product deleted successfully");
-      onClose();
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      onCloseAction();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to delete product");
     } finally {
@@ -43,7 +46,7 @@ export default function DeleteProductModal({
   };
 
   return (
-    <Dialog open onOpenChange={onClose}>
+    <Dialog open onOpenChange={onCloseAction}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Delete Product</DialogTitle>
@@ -55,7 +58,7 @@ export default function DeleteProductModal({
           </p>
 
           <div className="flex justify-center gap-3 pt-4">
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={onCloseAction}>
               Cancel
             </Button>
             <Button

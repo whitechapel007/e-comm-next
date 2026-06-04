@@ -16,10 +16,10 @@ import DeleteProductModal from "./DeleteProductModal";
 import { ProductType } from "../../../../../types/product";
 
 interface ProductTableProps {
-  products: ProductType[];
-  page: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
+  readonly products: ProductType[];
+  readonly page: number;
+  readonly totalPages: number;
+  readonly onPageChange: (page: number) => void;
 }
 
 export default function ProductTable({
@@ -138,7 +138,7 @@ export default function ProductTable({
       {selectedProduct && !deleteModalOpen && (
         <EditProductModal
           product={selectedProduct}
-          onClose={() => setSelectedProduct(null)}
+          onCloseAction={() => setSelectedProduct(null)}
         />
       )}
 
@@ -146,7 +146,7 @@ export default function ProductTable({
         <DeleteProductModal
           productId={selectedProduct.id}
           productName={selectedProduct.name}
-          onClose={() => {
+          onCloseAction={() => {
             setDeleteModalOpen(false);
             setSelectedProduct(null);
           }}

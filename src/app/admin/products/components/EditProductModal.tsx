@@ -7,12 +7,34 @@ import {
   FormProvider,
   Controller,
 } from "react-hook-form";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+
+type VariantImagesProps = { readonly index: number };
+
+function VariantImages({ index }: VariantImagesProps) {
+  return (
+    <ImageUploadField
+      name={`colorVariants.${index}.images`}
+      label="Variant Images"
+      uploadFn={async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        return data.url;
+      }}
+    />
+  );
+}
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -30,10 +52,10 @@ import { toast } from "sonner";
 
 export default function EditProductModal({
   product,
-  onClose,
+  onCloseAction,
 }: {
-  product: ProductType;
-  onClose: () => void;
+  readonly product: ProductType;
+  readonly onCloseAction: () => void;
 }) {
   const [loading, setLoading] = useState(false);
 
@@ -78,26 +100,10 @@ export default function EditProductModal({
   });
 
   // Nested variant images component
-  function VariantImages({ index }: { index: number }) {
-    return (
-      <ImageUploadField
-        name={`colorVariants.${index}.images`}
-        label="Variant Images"
-        uploadFn={async (file) => {
-          const formData = new FormData();
-          formData.append("file", file);
-          const res = await fetch("/api/upload", {
-            method: "POST",
-            body: formData,
-          });
-          const data = await res.json();
-          return data.url;
-        }}
-      />
-    );
-  }
 
   // Update product API
+  const queryClient = useQueryClient();
+
   const updateProduct = async (id: string, data: ProductFormValues) => {
     const payload = {
       ...data,
@@ -114,14 +120,17 @@ export default function EditProductModal({
     };
 
     const res = await fetch(`/api/admin/products/${id}`, {
-      method:  "PUT",
+      method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify(payload),
+      body: JSON.stringify(payload),
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.error ?? "Failed to update product");
 
     if (json.product) {
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      queryClient.invalidateQueries({ queryKey: ["product", id] });
+
       const returned = json.product;
       reset({
         name: returned.name,
@@ -156,7 +165,7 @@ export default function EditProductModal({
     try {
       setLoading(true);
       await updateProduct(product.id, data);
-      onClose();
+      onCloseAction();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to update product");
     } finally {
@@ -165,7 +174,7 @@ export default function EditProductModal({
   };
 
   return (
-    <Dialog open onOpenChange={onClose}>
+    <Dialog open onOpenChange={onCloseAction}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Product</DialogTitle>
@@ -346,7 +355,7 @@ export default function EditProductModal({
             <Separator />
 
             <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={onClose} type="button">
+              <Button variant="outline" onClick={onCloseAction} type="button">
                 Cancel
               </Button>
               <Button type="submit" disabled={loading}>

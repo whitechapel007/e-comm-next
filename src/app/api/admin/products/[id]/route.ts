@@ -142,6 +142,18 @@ export async function DELETE(
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
+    const orderItemCount = await prisma.orderItem.count({ where: { productId: id } });
+    if (orderItemCount > 0) {
+      return NextResponse.json(
+        {
+          error:
+            "This product cannot be deleted because it is referenced by existing orders. " +
+            "Please archive the product or remove it from orders first.",
+        },
+        { status: 409 }
+      );
+    }
+
     await prisma.product.delete({ where: { id } });
     return NextResponse.json({ message: "Product deleted successfully", productId: id });
   } catch (error) {
