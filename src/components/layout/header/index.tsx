@@ -47,13 +47,15 @@ const data: NavMenu = [
         id: 11,
         label: "Kaftans",
         url: "/shop?category=kaftan",
-        description: "Flowing, luxurious Kaftans tailored to perfection in Akoka",
+        description:
+          "Flowing, luxurious Kaftans tailored to perfection in Akoka",
       },
       {
         id: 12,
         label: "Agbada",
         url: "/shop?category=agbada",
-        description: "Regal Agbada sets — the pinnacle of Nigerian formal style",
+        description:
+          "Regal Agbada sets — the pinnacle of Nigerian formal style",
       },
       {
         id: 13,
@@ -111,18 +113,27 @@ const Navbar = () => {
 
   const filteredData = useMemo(
     () => data.filter((item) => !(item.admin && !isAdmin)),
-    [isAdmin]
+    [isAdmin],
   );
 
   return (
-    <header className={`sticky top-0 z-30 transition-all duration-300 ${scrolled ? "border-b bg-white/95 shadow-sm backdrop-blur" : "bg-white/90"}`}>
+    <header
+      className={`sticky top-0 z-30 transition-all duration-300 ${scrolled ? "border-b bg-white/95 shadow-sm backdrop-blur" : "bg-white/90"}`}
+    >
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-3 md:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-3">
-            <Image src="/images/logo.png" alt="Eboya Boi" width={48} height={48} />
+            <Image
+              src="/images/logo.png"
+              alt="Eboya Boi"
+              width={48}
+              height={48}
+            />
             <div>
               <p className="text-lg font-semibold tracking-tight">Eboya Boi</p>
-              <p className="text-xs uppercase tracking-[0.25em] text-slate-500">Akoka, Lagos</p>
+              <p className="text-xs uppercase tracking-[0.25em] text-slate-500">
+                Akoka, Lagos
+              </p>
             </div>
           </Link>
 
@@ -135,7 +146,18 @@ const Navbar = () => {
           <div className="hidden md:flex flex-1 items-center justify-center">
             <div className="relative w-full max-w-2xl">
               <span className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-slate-400">
-                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
               </span>
               <input
                 type="search"
@@ -159,7 +181,10 @@ const Navbar = () => {
                 <div key={item.id}>
                   {item.type === "MenuItem" && (
                     <NavigationMenuItem asChild>
-                      <Link href={item.url ?? "/"} className="px-3 py-2 text-sm font-medium text-slate-700 transition hover:text-slate-900">
+                      <Link
+                        href={item.url ?? "/"}
+                        className="px-3 py-2 text-sm font-medium text-slate-700 transition hover:text-slate-900"
+                      >
                         {item.label}
                       </Link>
                     </NavigationMenuItem>
@@ -178,8 +203,12 @@ const Navbar = () => {
                                 href={child.url ?? "/"}
                                 className="block rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-800 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
                               >
-                                <p className="text-base font-semibold">{child.label}</p>
-                                <p className="mt-2 text-xs text-slate-500">{child.description}</p>
+                                <p className="text-base font-semibold">
+                                  {child.label}
+                                </p>
+                                <p className="mt-2 text-xs text-slate-500">
+                                  {child.description}
+                                </p>
                               </Link>
                             </NavigationMenuLink>
                           ))}

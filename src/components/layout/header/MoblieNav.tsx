@@ -25,7 +25,10 @@ const MoblieNav = ({ data }: { data: NavMenu }) => {
 
       <SheetContent side="left" className="overflow-y-auto px-4 py-4">
         <SheetHeader className="flex items-center justify-between">
-          <Link href="/" className="text-xl font-semibold tracking-tight text-slate-900">
+          <Link
+            href="/"
+            className="text-xl font-semibold tracking-tight text-slate-900"
+          >
             Eboya Boi
           </Link>
           <SheetClose asChild>
@@ -49,7 +52,11 @@ const MoblieNav = ({ data }: { data: NavMenu }) => {
                 </SheetClose>
               )}
               {item.type === "MenuList" && (
-                <Accordion type="single" collapsible className="w-full rounded-2xl border border-slate-200 bg-slate-50">
+                <Accordion
+                  type="single"
+                  collapsible
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50"
+                >
                   <AccordionItem value={item.label} className="border-none">
                     <AccordionTrigger className="w-full px-4 py-3 text-left text-base font-medium text-slate-900">
                       {item.label}
