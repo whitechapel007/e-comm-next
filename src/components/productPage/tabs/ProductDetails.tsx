@@ -1,5 +1,3 @@
-import React from "react";
-
 export type SpecItem = {
   label: string;
   value: string;
@@ -7,7 +5,7 @@ export type SpecItem = {
 
 const specsData: SpecItem[] = [
   {
-    label: " Material composition",
+    label: "Material composition",
     value: "100% Cotton",
   },
   {
@@ -27,8 +25,8 @@ const specsData: SpecItem[] = [
 const ProductDetails = () => {
   return (
     <>
-      {specsData.map((item, i) => (
-        <div className="grid grid-cols-3" key={i}>
+      {specsData.map((item) => (
+        <div className="grid grid-cols-3" key={item.label}>
           <div>
             <p className="text-sm py-3 w-full leading-7 lg:py-4 pr-2 text-neutral-500">
               {item.label}

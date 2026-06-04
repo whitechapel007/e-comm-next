@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Accordion,
   AccordionContent,
@@ -51,8 +50,8 @@ const FaqContent = () => {
         Frequently asked questions
       </h3>
       <Accordion type="single" collapsible>
-        {faqsData.map((faq, idx) => (
-          <AccordionItem key={idx} value={`item-${idx + 1}`}>
+        {faqsData.map((faq) => (
+          <AccordionItem key={faq.question} value={faq.question}>
             <AccordionTrigger className="text-left">
               {faq.question}
             </AccordionTrigger>

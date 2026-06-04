@@ -44,15 +44,10 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user }) {
+      // Only runs on sign-in — embed role into the JWT so no DB hit per request
       if (user) {
         token.id = user.id;
         token.role = user.role;
-      } else {
-        // If user already logged in, refresh role from DB
-        const dbUser = await prisma.user.findUnique({
-          where: { id: token.id },
-        });
-        if (dbUser) token.role = dbUser.role;
       }
       return token;
     },

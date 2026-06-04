@@ -15,62 +15,75 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
+type SearchParams = { [key: string]: string | string[] | undefined };
+
 interface ShopPageProps {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: Promise<SearchParams>;
 }
 
-export default async function ShopPage({ searchParams }: ShopPageProps) {
-  const params = await searchParams;
-  const { category, color, size, minPrice, maxPrice, page, limit } = params;
+const categoryMap: Record<string, "SHOES" | "BAGS" | "CLOTHING" | "ACCESSORIES"> = {
+  shoes: "SHOES",
+  bags: "BAGS",
+  clothing: "CLOTHING",
+  accessories: "ACCESSORIES",
+};
 
-  const currentPage = parseInt((page as string) || "1");
-  const pageSize = parseInt((limit as string) || "12");
-  const skip = (currentPage - 1) * pageSize;
+function scalar(v: string | string[] | undefined): string | undefined {
+  return Array.isArray(v) ? v[0] : v;
+}
 
-  // --- Build Filters ---
+function buildFilters(params: SearchParams): Prisma.ProductWhereInput {
   const filters: Prisma.ProductWhereInput = {};
-
-  const categoryMap: Record<
-    string,
-    "SHOES" | "BAGS" | "CLOTHING" | "ACCESSORIES"
-  > = {
-    shoes: "SHOES",
-    bags: "BAGS",
-    clothing: "CLOTHING",
-    accessories: "ACCESSORIES",
-  };
+  const { category, color, size, minPrice, maxPrice } = params;
 
   if (typeof category === "string" && categoryMap[category.toLowerCase()]) {
     filters.category = categoryMap[category.toLowerCase()];
   }
 
-  const colorValue = Array.isArray(color) ? color[0] : color;
-  const sizeValue = Array.isArray(size) ? size[0] : size;
-
-  // Handle color filter
+  const colorValue = scalar(color);
   if (colorValue) {
     filters.colorVariants = {
-      some: {
-        colorName: { equals: colorValue },
-      },
+      some: { colorName: { contains: colorValue, mode: "insensitive" } },
     };
   }
 
-  // Handle size filter (sizes are on Product, not ColorVariant)
+  const sizeValue = scalar(size);
   if (sizeValue) {
     filters.sizes = {
-      some: {
-        name: { equals: sizeValue },
-      },
+      some: { name: { equals: sizeValue, mode: "insensitive" } },
     };
   }
 
   if (minPrice || maxPrice) {
     filters.basePrice = {
-      gte: minPrice ? parseFloat(minPrice as string) : undefined,
-      lte: maxPrice ? parseFloat(maxPrice as string) : undefined,
+      gte: minPrice ? Number.parseFloat(scalar(minPrice) ?? "0") : undefined,
+      lte: maxPrice ? Number.parseFloat(scalar(maxPrice) ?? "0") : undefined,
     };
   }
+
+  return filters;
+}
+
+export default async function ShopPage({ searchParams }: Readonly<ShopPageProps>) {
+  const params = await searchParams;
+  const { page, limit } = params;
+
+  const currentPage = Math.max(1, Number.parseInt((page as string) || "1"));
+  const pageSize = Math.min(48, Math.max(1, Number.parseInt((limit as string) || "12")));
+  const skip = (currentPage - 1) * pageSize;
+
+  // Build base query params string for pagination (preserves all active filters)
+  const filterParams = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) {
+    if (k !== "page" && v) filterParams.set(k, Array.isArray(v) ? v[0] : v);
+  }
+  const buildPageUrl = (p: number) => {
+    const q = new URLSearchParams(filterParams);
+    q.set("page", String(p));
+    return `?${q.toString()}`;
+  };
+
+  const filters = buildFilters(params);
 
   // --- Fetch products ---
   const [products, totalCount] = await Promise.all([
@@ -82,6 +95,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
       },
       skip,
       take: pageSize,
+      orderBy: { createdAt: "desc" },
     }),
     prisma.product.count({ where: filters }),
   ]);
@@ -108,9 +122,11 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             </div>
 
             {/* Product Grid */}
-            <div className="grid grid-cols-2  sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-5 place-items-center">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-5 place-items-center">
               {products.length ? (
-                products.map((p) => <ProductCard key={p.id} product={p} />)
+                products.map((p, index) => (
+                  <ProductCard key={p.id} product={p} priority={index < 6} />
+                ))
               ) : (
                 <div className="col-span-full text-center text-black/60 py-20">
                   No products found.
@@ -118,11 +134,11 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
               )}
             </div>
 
-            {/* Pagination */}
+            {/* Pagination — preserves all active filters */}
             {totalPages > 1 && (
               <Pagination className="justify-center mt-6">
                 <PaginationPrevious
-                  href={`?page=${Math.max(1, currentPage - 1)}`}
+                  href={buildPageUrl(Math.max(1, currentPage - 1))}
                   className={`border border-black/10 ${
                     currentPage === 1 ? "opacity-50 pointer-events-none" : ""
                   }`}
@@ -133,7 +149,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                     return (
                       <PaginationItem key={pageNum}>
                         <PaginationLink
-                          href={`?page=${pageNum}`}
+                          href={buildPageUrl(pageNum)}
                           isActive={pageNum === currentPage}
                           className="text-black/50 font-medium text-sm"
                         >
@@ -144,11 +160,9 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                   })}
                 </PaginationContent>
                 <PaginationNext
-                  href={`?page=${Math.min(totalPages, currentPage + 1)}`}
+                  href={buildPageUrl(Math.min(totalPages, currentPage + 1))}
                   className={`border border-black/10 ${
-                    currentPage === totalPages
-                      ? "opacity-50 pointer-events-none"
-                      : ""
+                    currentPage === totalPages ? "opacity-50 pointer-events-none" : ""
                   }`}
                 />
               </Pagination>

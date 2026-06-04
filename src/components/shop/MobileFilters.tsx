@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import {
   Drawer,
   DrawerContent,
@@ -22,7 +23,9 @@ const MobileFilters = () => {
         <DrawerHeader>
           <DrawerTitle className="text-xl font-bold">Filters</DrawerTitle>
         </DrawerHeader>
-        <Filters />
+        <Suspense fallback={<div className="py-4 text-center text-sm text-muted-foreground">Loading filters…</div>}>
+          <Filters />
+        </Suspense>
       </DrawerContent>
     </Drawer>
   );

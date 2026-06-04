@@ -2,32 +2,23 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import React, { useState } from "react";
+import { useState } from "react";
 import ProductDetailsContent from "./ProductDetailsContent";
 import ReviewsContent from "./ReviewsContent";
 import FaqContent from "./FaqContent";
+import { ProductType } from "../../../../types/product";
 
-type TabBtn = {
-  id: number;
-  label: string;
-};
+interface TabsProps {
+  product: ProductType;
+}
 
-const tabBtnData: TabBtn[] = [
-  {
-    id: 1,
-    label: "Product Details",
-  },
-  {
-    id: 2,
-    label: "Rating & Reviews",
-  },
-  {
-    id: 3,
-    label: "FAQs",
-  },
+const tabBtnData = [
+  { id: 1, label: "Product Details" },
+  { id: 2, label: "Rating & Reviews" },
+  { id: 3, label: "FAQs" },
 ];
 
-const Tabs = () => {
+const Tabs = ({ product }: Readonly<TabsProps>) => {
   const [active, setActive] = useState<number>(1);
 
   return (
@@ -51,8 +42,8 @@ const Tabs = () => {
         ))}
       </div>
       <div className="mb-12 sm:mb-16">
-        {active === 1 && <ProductDetailsContent />}
-        {active === 2 && <ReviewsContent />}
+        {active === 1 && <ProductDetailsContent product={product} />}
+        {active === 2 && <ReviewsContent productId={product.id} />}
         {active === 3 && <FaqContent />}
       </div>
     </div>

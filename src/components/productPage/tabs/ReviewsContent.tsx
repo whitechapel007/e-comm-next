@@ -12,7 +12,7 @@ import ReviewCard from "@/components/common/ReviewCard";
 import Link from "next/link";
 import { reviewsData } from "../../../../utils/mockData";
 
-const ReviewsContent = () => {
+const ReviewsContent = ({ productId: _ }: Readonly<{ productId: string }>) => {
   return (
     <section>
       <div className="flex items-center justify-between flex-col sm:flex-row mb-5 sm:mb-6">

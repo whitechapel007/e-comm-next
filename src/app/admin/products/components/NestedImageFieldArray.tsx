@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   FormItem,
@@ -62,7 +63,7 @@ const NestedImageFieldArray: React.FC<NestedImageFieldArrayProps> = ({
       append({ url: data.url });
     } catch (err) {
       console.error("Image upload failed:", err);
-      alert("Failed to upload image");
+      toast.error("Failed to upload image");
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";

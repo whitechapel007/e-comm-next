@@ -19,15 +19,14 @@ export default function BrandsSlide() {
       <Card className="bg-black border-none shadow-none p-0">
         <div className="relative w-full h-14 flex items-center overflow-hidden">
           <motion.div
-            initial={{ x: "-100%" }}
-            animate={{ x: "100%" }}
+            animate={{ x: ["0%", "-50%"] }}
             transition={{
               repeat: Infinity,
               repeatType: "loop",
-              duration: 12,
+              duration: 18,
               ease: "linear",
             }}
-            className="flex gap-x-10 whitespace-nowrap"
+            className="flex gap-x-16 whitespace-nowrap"
           >
             {[...brands, ...brands].map((brand, idx) => (
               <span

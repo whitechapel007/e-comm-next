@@ -1,21 +1,19 @@
 "use client";
 
-import React from "react";
 import { Separator } from "@/components/ui/separator";
 import CategoriesSection from "./CategoriesSection";
 import ColorsSection from "./ColorsSection";
 import PriceSection from "./PriceSection";
-// import SizeSection from "./SizeSection";
 import DressStyleSection from "./DressStyle";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 const Filters = () => {
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleClearFilters = () => {
-    const basePath = window.location.pathname;
-    router.push(basePath);
+    router.push(pathname);
   };
 
   return (
@@ -25,8 +23,6 @@ const Filters = () => {
       <PriceSection />
       <Separator />
       <ColorsSection />
-      <Separator />
-      {/* <SizeSection /> */}
       <Separator />
       <DressStyleSection />
       <Separator />

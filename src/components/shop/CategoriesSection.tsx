@@ -8,23 +8,28 @@ import {
 } from "@/components/ui/accordion";
 import { ArrowRight } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const categoriesData = [
-  { title: "Men's Clothes", slug: "men" },
-  { title: "Women's Clothes", slug: "women" },
+  { title: "Clothing", slug: "clothing" },
   { title: "Shoes", slug: "shoes" },
   { title: "Bags", slug: "bags" },
-  { title: "Gowns", slug: "gowns" },
+  { title: "Accessories", slug: "accessories" },
 ];
 
 const CategoriesSection = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const current = searchParams.get("category");
 
-  const handleSelect = (category: string) => {
+  const handleSelect = (slug: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (category) params.set("category", category);
-    else params.delete("category");
+    if (current === slug) {
+      params.delete("category");
+    } else {
+      params.set("category", slug);
+    }
+    params.delete("page");
     router.push(`/shop?${params.toString()}`);
   };
 
@@ -36,12 +41,15 @@ const CategoriesSection = () => {
         </AccordionTrigger>
         <AccordionContent className="pt-4 pb-0">
           <div className="flex flex-col text-black/60 space-y-1">
-            {categoriesData.map((cat, idx) => (
+            {categoriesData.map((cat) => (
               <button
-                key={idx}
+                key={cat.slug}
                 type="button"
                 onClick={() => handleSelect(cat.slug)}
-                className="flex items-center justify-between py-2 hover:text-black transition"
+                className={cn(
+                  "flex items-center justify-between py-2 hover:text-black transition",
+                  current === cat.slug && "text-black font-medium"
+                )}
               >
                 {cat.title} <ArrowRight />
               </button>

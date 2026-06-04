@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -10,29 +10,35 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { useRouter, useSearchParams } from "next/navigation";
 
+const MIN = 0;
+const MAX = 1_000_000;
+
 const PriceSection = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const minFromUrl = parseFloat(searchParams.get("minPrice") || "0");
-  const maxFromUrl = parseFloat(searchParams.get("maxPrice") || "1000000");
+  const minFromUrl = Number.parseFloat(searchParams.get("minPrice") || String(MIN));
+  const maxFromUrl = Number.parseFloat(searchParams.get("maxPrice") || String(MAX));
 
-  const [priceRange, setPriceRange] = useState<[number, number]>([
-    minFromUrl,
-    maxFromUrl,
-  ]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([minFromUrl, maxFromUrl]);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set("minPrice", priceRange[0].toString());
-      params.set("maxPrice", priceRange[1].toString());
-      router.push(`?${params.toString()}`);
-    }, 500);
+  const handleChange = (val: number[]) => {
+    setPriceRange(val as [number, number]);
+  };
 
-    return () => clearTimeout(timeout);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [priceRange, router]);
+  const handleCommit = (val: number[]) => {
+    const [min, max] = val as [number, number];
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (min === MIN) params.delete("minPrice");
+    else params.set("minPrice", String(min));
+
+    if (max === MAX) params.delete("maxPrice");
+    else params.set("maxPrice", String(max));
+
+    params.delete("page");
+    router.push(`?${params.toString()}`);
+  };
 
   return (
     <Accordion type="single" collapsible defaultValue="filter-price">
@@ -43,14 +49,15 @@ const PriceSection = () => {
         <AccordionContent className="pt-4 pb-0">
           <Slider
             value={priceRange}
-            min={0}
-            max={1000000}
-            step={100}
-            onValueChange={(val) => setPriceRange(val as [number, number])}
+            min={MIN}
+            max={MAX}
+            step={500}
+            onValueChange={handleChange}
+            onValueCommit={handleCommit}
           />
           <div className="flex justify-between text-sm text-black/70 mt-2">
-            <span>₦{priceRange[0]}</span>
-            <span>₦{priceRange[1]}</span>
+            <span>₦{priceRange[0].toLocaleString()}</span>
+            <span>₦{priceRange[1].toLocaleString()}</span>
           </div>
         </AccordionContent>
       </AccordionItem>

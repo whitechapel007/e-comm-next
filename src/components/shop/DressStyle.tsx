@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/accordion";
 import { ArrowRight } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const dressStylesData = [
   { title: "Casual", slug: "casual" },
@@ -19,11 +20,16 @@ const dressStylesData = [
 const DressStyleSection = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const current = searchParams.get("style");
 
-  const handleSelect = (style: string) => {
+  const handleSelect = (slug: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (style) params.set("style", style);
-    else params.delete("style");
+    if (current === slug) {
+      params.delete("style");
+    } else {
+      params.set("style", slug);
+    }
+    params.delete("page");
     router.push(`/shop?${params.toString()}`);
   };
 
@@ -35,12 +41,15 @@ const DressStyleSection = () => {
         </AccordionTrigger>
         <AccordionContent className="pt-4 pb-0">
           <div className="flex flex-col text-black/60 space-y-1">
-            {dressStylesData.map((style, idx) => (
+            {dressStylesData.map((style) => (
               <button
-                key={idx}
+                key={style.slug}
                 type="button"
                 onClick={() => handleSelect(style.slug)}
-                className="flex items-center justify-between py-2 hover:text-black transition"
+                className={cn(
+                  "flex items-center justify-between py-2 hover:text-black transition",
+                  current === style.slug && "text-black font-medium"
+                )}
               >
                 {style.title} <ArrowRight />
               </button>

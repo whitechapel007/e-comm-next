@@ -44,7 +44,7 @@ export default async function ProductPage({
     <main className="bg-white">
       <div className="max-w-7xl mx-auto px-4 xl:px-0">
         <hr className="border-t-black/10 mb-5 sm:mb-6" />
-        <BreadcrumbComponent details={productData.slug} />
+        <BreadcrumbComponent details={productData.name} />
 
         <section className="relative grid grid-cols-1 lg:grid-cols-3 gap-8 my-8">
           <div className="lg:col-span-2">
@@ -55,7 +55,7 @@ export default async function ProductPage({
         <div className="pb-24 lg:pb-0" />
 
         {/* Tabs Section */}
-        <Tabs />
+        <Tabs product={productData} />
       </div>
 
       {/* Mobile Add to Cart Bar */}
