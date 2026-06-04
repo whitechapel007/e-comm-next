@@ -16,7 +16,7 @@ interface OrderPayload {
   totalAmount: number;
   shippingAddress: string;
   phoneNumber: string;
-  paymentRef?: string; // optional, will auto-generate if missing
+  paymentRef?: string;
 }
 
 // Helper: validate admin session
@@ -52,17 +52,13 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
 
-    // Ensure unique paymentRef
-    const uniquePaymentRef = paymentRef || nanoid(12);
-
-    // Create order
     const order = await prisma.order.create({
       data: {
         userId: session.user.id,
         totalAmount,
         shippingAddress,
         phoneNumber,
-        paymentRef: uniquePaymentRef,
+        paymentRef: paymentRef ?? null,
         status: "PENDING",
         paymentStatus: "PENDING",
       },
