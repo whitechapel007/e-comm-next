@@ -8,14 +8,13 @@ export type Color = {
   images: ColorVariantImage[];
 };
 
-// Define a type for the slice state
 interface ProductSelectionState {
   selectedColor: Color | null;
   selectedSize: string | null;
   currentImageIndex: number;
   currentImage: string;
 }
-// Define the initial state using that type
+
 const initialState: ProductSelectionState = {
   selectedColor: null,
   selectedSize: null,
@@ -25,14 +24,11 @@ const initialState: ProductSelectionState = {
 
 export const productsSlice = createSlice({
   name: "productSelection",
-
   initialState,
   reducers: {
     setColorSelection: (state, action: PayloadAction<Color>) => {
       state.selectedColor = action.payload;
       state.currentImageIndex = 0;
-
-      // Reset gallery on color change
     },
     setSizeSelection: (state, action: PayloadAction<string>) => {
       state.selectedSize = action.payload;
@@ -43,6 +39,7 @@ export const productsSlice = createSlice({
     setCurrentImage: (state, action: PayloadAction<string>) => {
       state.currentImage = action.payload;
     },
+    resetProductSelection: () => initialState,
   },
 });
 
@@ -51,6 +48,7 @@ export const {
   setSizeSelection,
   setCurrentImageIndex,
   setCurrentImage,
+  resetProductSelection,
 } = productsSlice.actions;
 
 export default productsSlice.reducer;

@@ -1,96 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-interface OrderItemPayload {
-  productId: string;
-  quantity: number;
-  price: number;
-  size?: string | null;
-  colorName?: string | null;
-}
-
-interface OrderPayload {
-  cartItems: OrderItemPayload[];
-  totalAmount: number;
-  shippingAddress: string;
-  phoneNumber: string;
-  paymentRef?: string;
-}
-
-// Helper: validate admin session
-async function getAdminSession() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) throw { status: 401, message: "Unauthorized" };
-  if (session.user.role !== "ADMIN")
-    throw { status: 403, message: "Forbidden, admin only" };
-  return session;
-}
-
-// POST: Create a new order
-export async function POST(req: NextRequest) {
-  try {
-    const session = await getAdminSession();
-    const {
-      cartItems,
-      totalAmount,
-      shippingAddress,
-      phoneNumber,
-      paymentRef,
-    }: OrderPayload = await req.json();
-
-    if (!Array.isArray(cartItems) || !cartItems.length)
-      return NextResponse.json(
-        { error: "Cart items must be a non-empty array" },
-        { status: 400 }
-      );
-
-    if (typeof totalAmount !== "number")
-      return NextResponse.json(
-        { error: "Invalid total amount" },
-        { status: 400 }
-      );
-
-    const order = await prisma.order.create({
-      data: {
-        userId: session.user.id,
-        totalAmount,
-        shippingAddress,
-        phoneNumber,
-        paymentRef: paymentRef ?? null,
-        status: "PENDING",
-        paymentStatus: "PENDING",
-      },
-    });
-
-    // Create order items
-    const orderItemsData = cartItems.map((item) => ({
-      orderId: order.id,
-      productId: item.productId,
-      quantity: item.quantity,
-      price: item.price,
-      size: item.size ?? null,
-      colorName: item.colorName ?? null,
-    }));
-
-    await prisma.orderItem.createMany({ data: orderItemsData });
-
-    return NextResponse.json(
-      { message: "Order created successfully", orderId: order.id },
-      { status: 201 }
-    );
-  } catch (err) {
-    console.error("Create order error:", err);
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Failed to create order" },
-      { status: 500 }
-    );
-  }
-}
-
-// GET: Retrieve all orders
+// GET /api/admin/orders — admin only
 export async function GET() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (session.user.role !== "ADMIN") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   try {
     const orders = await prisma.order.findMany({
       include: {
@@ -102,9 +24,9 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({ orders }, { status: 200 });
+    return NextResponse.json({ orders });
   } catch (err) {
-    console.error("Get orders error:", err);
+    console.error("GET /api/admin/orders:", err);
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Failed to fetch orders" },
       { status: 500 }

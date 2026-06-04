@@ -22,7 +22,6 @@ import { Plus, Trash } from "lucide-react";
 import NestedImageFieldArray from "./NestedImageFieldArray";
 import NestedStockFieldArray from "./NestedStockFieldArray";
 import ImageUploadField from "./ImageUploadField";
-import axios from "axios";
 import { toast } from "sonner";
 
 interface ColorVariant {
@@ -90,13 +89,18 @@ export default function AddProductModal({ onClose }: { onClose: () => void }) {
   const onSubmit = async (data: ProductFormValues) => {
     setLoading(true);
     try {
-      await axios.post("/api/admin/products", data);
-      toast.success("✅ Product added successfully");
+      const res = await fetch("/api/admin/products", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify(data),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Failed to add product");
+      toast.success("Product added successfully");
       reset();
       onClose();
-    } catch (error: unknown) {
-      if (error instanceof Error)
-        toast.error(`Failed to add product: ${error.message}`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to add product");
     } finally {
       setLoading(false);
     }

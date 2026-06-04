@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import PhotoSection from "./PhotoSection";
 import ColorSelection from "./ColorSelection";
 import SizeSelection from "./SizeSelection";
@@ -7,8 +8,19 @@ import AddToCartSection from "./AddToCartSection";
 import RenderStars from "../ui/RenderStars";
 import { ProductType as Product } from "../../../types/product";
 import { cn } from "@/lib/utils";
+import { useAppDispatch } from "@/lib/redux";
+import { resetProductSelection } from "@/store/productSlice";
 
 const ProductDetail = ({ data }: { data: Product }) => {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    // Reset color/size/image selection when leaving this product page
+    return () => {
+      dispatch(resetProductSelection());
+    };
+  }, [dispatch]);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
       {/* Product Images */}

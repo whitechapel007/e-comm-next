@@ -46,7 +46,7 @@ const PhotoSection = ({ data }: { data: ProductType }) => {
         {currentImages.length
           ? currentImages.map((url, idx) => (
               <button
-                key={`${currentColorVariant?.id || "default"}-${idx}`}
+                key={url}
                 type="button"
                 aria-label={`View image ${idx + 1} of ${currentImages.length}`}
                 className={`bg-[#F0EEED] rounded-lg xl:rounded-[20px] aspect-square w-full max-w-[111px] xl:max-w-[152px] max-h-[106px] xl:max-h-[167px] overflow-hidden transition-all duration-300 ${
@@ -67,9 +67,9 @@ const PhotoSection = ({ data }: { data: ProductType }) => {
               </button>
             ))
           : // Skeleton placeholders
-            Array.from({ length: 3 }).map((_, idx) => (
+            (["sk-1", "sk-2", "sk-3"] as const).map((id) => (
               <div
-                key={idx}
+                key={id}
                 className="bg-gray-200 animate-pulse rounded-lg xl:rounded-[20px] w-full max-w-[111px] xl:max-w-[152px] max-h-[106px] xl:max-h-[167px] aspect-square"
               />
             ))}

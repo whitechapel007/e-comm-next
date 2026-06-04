@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 
 import { Button } from "@/components/ui/button";
 import ProductTable from "./components/ProductTable";
@@ -25,10 +24,11 @@ export default function AdminProductsPage() {
   const { data, isLoading, isError, error } = useQuery<ProductsResponse>({
     queryKey: ["admin-products", page],
     queryFn: async () => {
-      const res = await axios.get("/api/admin/products", {
-        params: { page, limit },
-      });
-      return res.data;
+      const res = await fetch(
+        `/api/admin/products?page=${page}&limit=${limit}`
+      );
+      if (!res.ok) throw new Error("Failed to load products");
+      return res.json();
     },
   });
 

@@ -29,12 +29,29 @@ const AddToCartSection = ({ data }: AddToCartSectionProps) => {
     discount: data.discount ?? null,
   });
 
+  const hasVariants = data.colorVariants.length > 0;
+  const hasSizes    = (data.sizes?.length ?? 0) > 0;
+
+  const validate = (): boolean => {
+    if (hasVariants && !selectedColor) {
+      toast.error("Please select a colour before adding to cart.");
+      return false;
+    }
+    if (hasSizes && !selectedSize) {
+      toast.error("Please select a size before adding to cart.");
+      return false;
+    }
+    return true;
+  };
+
   const handleAddToCart = () => {
+    if (!validate()) return;
     dispatch(addItem(buildCartItem()));
     toast.success(`${data.name} added to cart`);
   };
 
   const handleBuyNow = () => {
+    if (!validate()) return;
     dispatch(addItem(buildCartItem()));
     router.push("/checkout");
   };

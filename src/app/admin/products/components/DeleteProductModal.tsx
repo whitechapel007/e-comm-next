@@ -10,7 +10,6 @@ import {
 import { Button } from "@/components/ui/button";
 
 import { Loader2 } from "lucide-react";
-import axios from "axios";
 import { toast } from "sonner";
 
 interface DeleteProductModalProps {
@@ -26,19 +25,18 @@ export default function DeleteProductModal({
 }: DeleteProductModalProps) {
   const [loading, setLoading] = useState(false);
 
-  async function deleteProduct(id: string) {
-    return await axios.delete(`/api/admin/products/${id}`);
-  }
-
   const handleDelete = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      await deleteProduct(productId);
+      const res = await fetch(`/api/admin/products/${productId}`, { method: "DELETE" });
+      if (!res.ok) {
+        const json = await res.json();
+        throw new Error(json.error ?? "Failed to delete product");
+      }
       toast.success("Product deleted successfully");
       onClose();
     } catch (error) {
-      console.error("Failed to delete product:", error);
-      toast.error("Failed to delete product. Please try again.");
+      toast.error(error instanceof Error ? error.message : "Failed to delete product");
     } finally {
       setLoading(false);
     }

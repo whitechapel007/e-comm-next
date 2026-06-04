@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -37,8 +37,6 @@ const ColorsSection = () => {
   const [selected, setSelected] = useState<string | null>(
     colorFromUrl ? (reverseColorMap[colorFromUrl] ?? null) : null
   );
-  const isMounted = useRef(false);
-
   const handleSelect = (color: string) => {
     const next = selected === color ? null : color;
     setSelected(next);
@@ -49,9 +47,6 @@ const ColorsSection = () => {
     params.delete("page");
     router.push(`?${params.toString()}`);
   };
-
-  // Mark as mounted after first render so the ref trick is available for future renders
-  if (!isMounted.current) isMounted.current = true;
 
   return (
     <Accordion type="single" collapsible defaultValue="filter-colors">

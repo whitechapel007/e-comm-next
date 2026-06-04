@@ -1,106 +1,134 @@
-// app/api/products/route.ts
+// app/api/admin/products/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
+import { z } from "zod";
 
-function generateSlug(name: string): string {
+// ── Slug helpers ─────────────────────────────────────────────────────────────
+
+function baseSlug(name: string): string {
   return name
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9\s-]/g, "") // remove invalid chars
-    .replace(/\s+/g, "-") // replace spaces with -
-    .replace(/-+/g, "-"); // collapse multiple dashes
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
 }
 
-// Create a new product (admin only)
+async function uniqueSlug(name: string): Promise<string> {
+  const slug = baseSlug(name);
+  let candidate = slug;
+  let counter = 1;
+  while (await prisma.product.findUnique({ where: { slug: candidate } })) {
+    candidate = `${slug}-${counter++}`;
+  }
+  return candidate;
+}
+
+// ── Validation schema ─────────────────────────────────────────────────────────
+
+const colorVariantSchema = z.object({
+  colorName: z.string().min(1),
+  colorCode: z.string().min(1),
+  price:     z.union([z.string(), z.number()]).transform((v) => Number.parseFloat(String(v))),
+  inStock:   z.boolean().default(true),
+  images:    z.array(z.object({ url: z.string().url() })).default([]),
+});
+
+const productSchema = z.object({
+  name:          z.string().min(2, "Name is required"),
+  description:   z.string().min(10, "Description is required"),
+  basePrice:     z.union([z.string(), z.number()]).transform((v) => Number.parseFloat(String(v))),
+  prevPrice:     z.union([z.string(), z.number()]).optional().nullable()
+                   .transform((v) => (v != null ? Number.parseFloat(String(v)) : null)),
+  discount:      z.union([z.string(), z.number()]).optional().nullable()
+                   .transform((v) => (v != null ? Number.parseFloat(String(v)) : null)),
+  category:      z.enum(["SHOES", "BAGS", "CLOTHING", "ACCESSORIES"]),
+  isTopSelling:  z.boolean().default(false),
+  isNewArrival:  z.boolean().default(false),
+  images:        z.array(z.object({ url: z.string().url() })).default([]),
+  colorVariants: z.array(colorVariantSchema).default([]),
+  sizes:         z.array(z.object({ name: z.string().min(1), quantity: z.string() })).default([]),
+});
+
+// ── POST: create product ─────────────────────────────────────────────────────
+
 export async function POST(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (session.user.role !== "ADMIN") {
+    return NextResponse.json({ error: "Forbidden — admins only" }, { status: 403 });
+  }
+
+  const parsed = productSchema.safeParse(await req.json());
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Invalid product data", details: parsed.error.flatten() },
+      { status: 400 }
+    );
+  }
+
+  const data = parsed.data;
+
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return NextResponse.json(
-        { error: "Unauthorized - Please login" },
-        { status: 401 }
-      );
-    }
-
-    if (session.user.role !== "ADMIN") {
-      return NextResponse.json(
-        { error: "Forbidden - Admins only" },
-        { status: 403 }
-      );
-    }
-
-    const data = await req.json();
+    const slug = await uniqueSlug(data.name);
 
     const product = await prisma.product.create({
       data: {
-        name: data.name,
-        slug: generateSlug(data.name),
-        description: data.description,
-
-        basePrice: parseFloat(data.basePrice),
-        prevPrice: data.prevPrice ? parseFloat(data.prevPrice) : null,
-        discount: data.discount ? parseFloat(data.discount) : null,
-        category: data.category,
+        name:         data.name,
+        slug,
+        description:  data.description,
+        basePrice:    data.basePrice,
+        prevPrice:    data.prevPrice ?? null,
+        discount:     data.discount ?? null,
+        category:     data.category,
         isTopSelling: data.isTopSelling,
         isNewArrival: data.isNewArrival,
         images: {
-          create: data.images.map((img: { url: string }) => ({ url: img.url })),
+          create: data.images.map((img) => ({ url: img.url })),
         },
         colorVariants: {
-          create: data.colorVariants.map(
-            (variant: {
-              colorName: string;
-              colorCode: string;
-              price: string;
-              inStock: boolean;
-              images: { url: string }[];
-            }) => ({
-              colorName: variant.colorName,
-              colorCode: variant.colorCode,
-              price: parseFloat(variant.price),
-              inStock: variant.inStock,
-              images: {
-                create: variant.images.map(({ url }) => ({ url })),
-              },
-            })
-          ),
+          create: data.colorVariants.map((v) => ({
+            colorName: v.colorName,
+            colorCode: v.colorCode,
+            price:     v.price,
+            inStock:   v.inStock,
+            images:    { create: v.images.map(({ url }) => ({ url })) },
+          })),
         },
         sizes: {
-          create: data.sizes.map(
-            (size: { name: string; quantity: string }) => ({
-              name: size.name,
-              quantity: size.quantity,
-            })
-          ),
+          create: data.sizes.map((s) => ({ name: s.name, quantity: s.quantity })),
         },
       },
     });
 
     return NextResponse.json(product, { status: 201 });
   } catch (error) {
-    console.error(error);
-    const message =
-      error instanceof Error ? error.message : "Failed to create product";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("POST /api/admin/products:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to create product" },
+      { status: 500 }
+    );
   }
 }
 
-// Get all products with pagination
+// ── GET: list products with pagination ───────────────────────────────────────
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const page = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
-    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") ?? "10")));
-    const skip = (page - 1) * limit;
+    const page  = Math.max(1, Number.parseInt(searchParams.get("page")  ?? "1"));
+    const limit = Math.min(100, Math.max(1, Number.parseInt(searchParams.get("limit") ?? "10")));
+    const skip  = (page - 1) * limit;
 
     const [products, totalCount] = await Promise.all([
       prisma.product.findMany({
         include: {
           colorVariants: { include: { images: true } },
-          sizes: true,
+          sizes:  true,
           images: true,
         },
         orderBy: { createdAt: "desc" },
@@ -117,7 +145,9 @@ export async function GET(req: NextRequest) {
       page,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to fetch products";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to fetch products" },
+      { status: 500 }
+    );
   }
 }

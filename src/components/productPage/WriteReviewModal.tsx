@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast } from "sonner";
 import { Star, Loader2 } from "lucide-react";
 import {
@@ -27,7 +27,6 @@ export default function WriteReviewModal({
   onSuccess,
 }: WriteReviewModalProps) {
   const { data: session } = useSession();
-  const router = useRouter();
   const [rating, setRating] = useState(0);
   const [hovered, setHovered] = useState(0);
   const [comment, setComment] = useState("");
@@ -91,7 +90,9 @@ export default function WriteReviewModal({
           </p>
           <div className="flex gap-3 justify-center">
             <Button variant="outline" onClick={onClose}>Cancel</Button>
-            <Button onClick={() => router.push("/auth/login")}>Sign in</Button>
+            <Button asChild>
+              <Link href="/auth/login">Sign in</Link>
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

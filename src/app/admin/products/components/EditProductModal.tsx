@@ -7,7 +7,6 @@ import {
   FormProvider,
   Controller,
 } from "react-hook-form";
-import axios from "axios";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +22,7 @@ import { Plus, Trash } from "lucide-react";
 import {
   ColorVariantWithDetails,
   ProductType,
-  size,
+  Size,
 } from "../../../../../types/product";
 import { ProductFormValues } from "./AddProductModal";
 import ImageUploadField from "./ImageUploadField";
@@ -58,7 +57,7 @@ export default function EditProductModal({
           images: v.images?.map((i) => ({ url: i.url })) || [],
         })
       ),
-      sizes: (product.sizes || []).map((s: size) => ({
+      sizes: (product.sizes || []).map((s: Size) => ({
         id: s.id,
         name: s.name,
         quantity: s.quantity,
@@ -114,10 +113,16 @@ export default function EditProductModal({
       images: data.images?.map((i: { url: string }) => ({ url: i.url })) || [],
     };
 
-    const response = await axios.put(`/api/admin/products/${id}`, payload);
+    const res = await fetch(`/api/admin/products/${id}`, {
+      method:  "PUT",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify(payload),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error ?? "Failed to update product");
 
-    if (response.data) {
-      const returned = response.data;
+    if (json.product) {
+      const returned = json.product;
       reset({
         name: returned.name,
         description: returned.description,
@@ -138,7 +143,7 @@ export default function EditProductModal({
               v.images?.map((i: { url: string }) => ({ url: i.url })) || [],
           })) || [],
         sizes:
-          returned.sizes?.map((s: size) => ({
+          returned.sizes?.map((s: Size) => ({
             id: s.id,
             name: s.name,
             quantity: s.quantity,
@@ -153,8 +158,7 @@ export default function EditProductModal({
       await updateProduct(product.id, data);
       onClose();
     } catch (err) {
-      toast.error("❌ Error updating product");
-      console.error(err);
+      toast.error(err instanceof Error ? err.message : "Failed to update product");
     } finally {
       setLoading(false);
     }

@@ -5,13 +5,13 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useAppSelector, useAppDispatch } from "@/lib/redux";
 import { RootState } from "@/store";
-import { removeItem, updateQuantity, CartItem } from "@/store/cartSlice";
+import { removeItem, updateQuantity } from "@/store/cartSlice";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Trash2, ShoppingCart, Tag } from "lucide-react";
+import { Trash2, ShoppingCart } from "lucide-react";
 
 export default function CartPage() {
   const cart = useAppSelector((state: RootState) => state.cart.items);
@@ -66,7 +66,7 @@ export default function CartPage() {
           animate={{ opacity: 1 }}
           className="lg:col-span-2 space-y-4"
         >
-          {cart.map((item: CartItem, index: number) => (
+          {cart.map((item, index) => (
             <motion.div
               key={item.cartKey}
               initial={{ opacity: 0, y: 20 }}
@@ -174,15 +174,6 @@ export default function CartPage() {
                 <span>Total</span>
                 <span>₦{total.toLocaleString()}</span>
               </div>
-            </div>
-
-            {/* Promo Code */}
-            <div className="mt-6 flex items-center gap-2">
-              <div className="relative flex-1">
-                <Tag className="absolute left-2 top-2.5 w-4 h-4 text-muted-foreground" />
-                <Input placeholder="Add promo code" className="pl-8" />
-              </div>
-              <Button variant="outline">Apply</Button>
             </div>
 
             {/* Checkout */}
