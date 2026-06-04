@@ -58,7 +58,13 @@ export default function WriteReviewModal({
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.error ?? "Failed to submit review.");
+        if (res.status === 409) {
+          toast.error("You have already reviewed this product.");
+          onSuccess(); // still mark as reviewed in parent
+          onClose();
+        } else {
+          toast.error(data.error ?? "Failed to submit review.");
+        }
         return;
       }
 

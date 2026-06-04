@@ -22,4 +22,5 @@ export interface ReviewsResponse {
   page: number;
   averageRating: number;
   ratingCount: number;
+  ratingDistribution: Record<number, number>;
 }

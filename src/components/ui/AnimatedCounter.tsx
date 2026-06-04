@@ -31,14 +31,14 @@ const AnimatedCounter = ({
     // Set initial value
     element.textContent = String(from);
 
-    // If reduced motion is enabled in system's preferences
-    if (window.matchMedia("(prefers-reduced-motion)").matches) {
+    // Respect user's reduced-motion preference
+    if (globalThis.window?.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       element.textContent = String(to);
       return;
     }
 
     const controls = animate(from, to, {
-      duration: 6,
+      duration: 1.5,
       ease: "easeOut",
       ...animationOptions,
       onUpdate(value) {

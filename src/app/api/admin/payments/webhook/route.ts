@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
     // ----------------------------------------------------------------------
 
     if (eventType === "charge.success") {
-      console.log("💰 Payment success webhook for:", reference);
+      console.info("Payment success:", reference, "order:", orderId);
 
       // Update transaction
       await prisma.transaction.update({
@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (eventType === "charge.failed") {
-      console.log("❌ Payment failed webhook for:", reference);
+      console.error("Payment failed:", reference, "order:", orderId);
 
       await prisma.transaction.update({
         where: { transactionRef: reference },
@@ -119,8 +119,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ status: "payment_failed" });
     }
 
-    // Unhandled events
-    console.log("⚠️ Unhandled Paystack webhook:", eventType);
+    console.warn("Unhandled Paystack webhook event:", eventType);
 
     return NextResponse.json({ status: "ignored" });
   } catch (error) {

@@ -15,6 +15,22 @@ import ReviewCard from "@/components/common/ReviewCard";
 import WriteReviewModal from "../WriteReviewModal";
 import { ReviewsResponse } from "../../../../types/review";
 
+function RatingBar({ star, count, pct }: { star: number; count: number; pct: number }) {
+  return (
+    <div className="flex items-center gap-2 text-xs">
+      <span className="w-3 text-right text-gray-500">{star}</span>
+      <Star size={10} className="text-yellow-400 fill-yellow-400 shrink-0" />
+      <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+        <div
+          className="h-full bg-yellow-400 rounded-full transition-all duration-500"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <span className="w-8 text-right text-gray-400">{count}</span>
+    </div>
+  );
+}
+
 interface ReviewsContentProps {
   productId: string;
   productSlug: string;
@@ -24,9 +40,10 @@ const LIMIT = 6;
 
 const ReviewsContent = ({ productId: _, productSlug }: Readonly<ReviewsContentProps>) => {
   const queryClient = useQueryClient();
-  const [sort, setSort]               = useState("latest");
-  const [page, setPage]               = useState(1);
-  const [modalOpen, setModalOpen]     = useState(false);
+  const [sort, setSort]             = useState("latest");
+  const [page, setPage]             = useState(1);
+  const [modalOpen, setModalOpen]   = useState(false);
+  const [hasReviewed, setHasReviewed] = useState(false);
 
   const queryKey = ["reviews", productSlug, sort, page];
 
@@ -48,25 +65,10 @@ const ReviewsContent = ({ productId: _, productSlug }: Readonly<ReviewsContentPr
   };
 
   const handleReviewSuccess = () => {
-    // Invalidate all pages so the new review appears immediately
     queryClient.invalidateQueries({ queryKey: ["reviews", productSlug] });
     setPage(1);
+    setHasReviewed(true);
   };
-
-  // Render star distribution bar
-  const renderRatingBar = (starCount: number, total: number, pct: number) => (
-    <div key={starCount} className="flex items-center gap-2 text-xs">
-      <span className="w-3 text-right text-gray-500">{starCount}</span>
-      <Star size={10} className="text-yellow-400 fill-yellow-400 shrink-0" />
-      <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-        <div
-          className="h-full bg-yellow-400 rounded-full transition-all duration-500"
-          style={{ width: total > 0 ? `${pct}%` : "0%" }}
-        />
-      </div>
-      <span className="w-6 text-gray-400">{pct}%</span>
-    </div>
-  );
 
   return (
     <section>
@@ -92,13 +94,17 @@ const ReviewsContent = ({ productId: _, productSlug }: Readonly<ReviewsContentPr
             </SelectContent>
           </Select>
 
-          <Button
-            type="button"
-            onClick={() => setModalOpen(true)}
-            className="px-4 py-3 rounded-full bg-black font-medium text-xs sm:text-sm h-11"
-          >
-            Write a Review
-          </Button>
+          {hasReviewed ? (
+            <span className="text-xs text-green-600 font-medium px-4">✓ Review submitted</span>
+          ) : (
+            <Button
+              type="button"
+              onClick={() => setModalOpen(true)}
+              className="px-4 py-3 rounded-full bg-black font-medium text-xs sm:text-sm h-11"
+            >
+              Write a Review
+            </Button>
+          )}
         </div>
       </div>
 
@@ -120,12 +126,11 @@ const ReviewsContent = ({ productId: _, productSlug }: Readonly<ReviewsContentPr
           </div>
           <div className="flex flex-col justify-center gap-1.5 flex-1">
             {[5, 4, 3, 2, 1].map((star) => {
-              const pct = data.ratingCount > 0
-                ? Math.round(
-                    (data.reviews.filter((r) => r.rating === star).length / data.ratingCount) * 100
-                  )
+              const count = data.ratingDistribution[star] ?? 0;
+              const pct   = data.ratingCount > 0
+                ? Math.round((count / data.ratingCount) * 100)
                 : 0;
-              return renderRatingBar(star, data.ratingCount, pct);
+              return <RatingBar key={star} star={star} count={count} pct={pct} />;
             })}
           </div>
         </div>

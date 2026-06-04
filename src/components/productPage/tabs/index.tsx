@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import ProductDetailsContent from "./ProductDetailsContent";
 import ReviewsContent from "./ReviewsContent";
-import FaqContent from "./FaqContent";
 import { ProductType } from "../../../../types/product";
 
 interface TabsProps {
@@ -15,7 +14,6 @@ interface TabsProps {
 const tabBtnData = [
   { id: 1, label: "Product Details" },
   { id: 2, label: "Rating & Reviews" },
-  { id: 3, label: "FAQs" },
 ];
 
 const Tabs = ({ product }: Readonly<TabsProps>) => {
@@ -44,7 +42,6 @@ const Tabs = ({ product }: Readonly<TabsProps>) => {
       <div className="mb-12 sm:mb-16">
         {active === 1 && <ProductDetailsContent product={product} />}
         {active === 2 && <ReviewsContent productId={product.id} productSlug={product.slug} />}
-        {active === 3 && <FaqContent />}
       </div>
     </div>
   );

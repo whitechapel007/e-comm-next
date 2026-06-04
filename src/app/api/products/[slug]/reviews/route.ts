@@ -35,7 +35,7 @@ export async function GET(
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    const [reviews, totalCount, aggregate] = await Promise.all([
+    const [reviews, totalCount, aggregate, groupedRatings] = await Promise.all([
       prisma.review.findMany({
         where: { productId: product.id },
         include: {
@@ -51,7 +51,19 @@ export async function GET(
         _avg: { rating: true },
         _count: { rating: true },
       }),
+      // Exact count per star value — used for distribution bars
+      prisma.review.groupBy({
+        by: ["rating"],
+        where: { productId: product.id },
+        _count: { rating: true },
+      }),
     ]);
+
+    // Build { 1: n, 2: n, 3: n, 4: n, 5: n } from groupBy result
+    const ratingDistribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    for (const group of groupedRatings) {
+      ratingDistribution[group.rating] = group._count.rating;
+    }
 
     return NextResponse.json({
       reviews,
@@ -62,6 +74,7 @@ export async function GET(
         ? Math.round(aggregate._avg.rating * 10) / 10
         : 0,
       ratingCount: aggregate._count.rating,
+      ratingDistribution,
     });
   } catch (error) {
     console.error("GET reviews error:", error);

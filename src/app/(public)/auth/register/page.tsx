@@ -52,8 +52,7 @@ export default function RegisterPage() {
         throw new Error("Login after registration failed");
       }
     } catch (err) {
-      if (err instanceof Error)
-        toast.error(err.message || "Something went wrong");
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setLoading(false);
     }

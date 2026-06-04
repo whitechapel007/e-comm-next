@@ -4,6 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import CategoriesSection from "./CategoriesSection";
 import ColorsSection from "./ColorsSection";
 import PriceSection from "./PriceSection";
+import SizeSection from "./SizeSection";
 import DressStyleSection from "./DressStyle";
 import { Button } from "@/components/ui/button";
 import { useRouter, usePathname } from "next/navigation";
@@ -23,6 +24,8 @@ const Filters = () => {
       <PriceSection />
       <Separator />
       <ColorsSection />
+      <Separator />
+      <SizeSection />
       <Separator />
       <DressStyleSection />
       <Separator />

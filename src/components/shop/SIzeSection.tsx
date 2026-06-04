@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -10,21 +9,23 @@ import {
 import { cn } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
 
+const SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
+
 const SizeSection = () => {
-  const router = useRouter();
+  const router      = useRouter();
   const searchParams = useSearchParams();
+  const selected     = searchParams.get("size") ?? "";
 
-  const [selected, setSelected] = useState<string>("");
-
-  useEffect(() => {
+  const handleSelect = (size: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (selected) params.set("size", selected);
-    else params.delete("size");
+    if (selected === size) {
+      params.delete("size");
+    } else {
+      params.set("size", size);
+    }
+    params.delete("page");
     router.push(`?${params.toString()}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selected, router]);
-
-  const sizes = ["S", "M", "L", "XL", "XXL"];
+  };
 
   return (
     <Accordion type="single" collapsible defaultValue="filter-size">
@@ -34,15 +35,16 @@ const SizeSection = () => {
         </AccordionTrigger>
         <AccordionContent className="pt-4 pb-0">
           <div className="flex flex-wrap gap-2">
-            {sizes.map((size, idx) => (
+            {SIZES.map((size) => (
               <button
-                key={idx}
+                key={size}
                 type="button"
+                aria-pressed={selected === size}
                 className={cn(
                   "px-4 py-2 rounded-full text-sm border border-gray-300 hover:border-black transition",
-                  selected === size && "bg-black text-white font-medium"
+                  selected === size && "bg-black text-white border-black font-medium"
                 )}
-                onClick={() => setSelected(size)}
+                onClick={() => handleSelect(size)}
               >
                 {size}
               </button>

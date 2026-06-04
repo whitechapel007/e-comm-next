@@ -59,10 +59,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Same as console.log(JSON.parse(data)) in the Node example
     return NextResponse.json({
       status: "success",
-      authorization: result.data, // contains access_code and authorization_url
+      authorization: result.data,
     });
   } catch (error) {
     console.error("Paystack initialize error:", error);

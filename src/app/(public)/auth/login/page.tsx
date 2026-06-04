@@ -32,8 +32,6 @@ export default function LoginPage() {
         redirect: false,
       });
 
-      setLoading(false);
-
       if (res?.ok) {
         toast.success("Login successful!");
         router.push("/");
@@ -41,13 +39,13 @@ export default function LoginPage() {
         toast.error(res?.error || "Invalid email or password");
       }
     } catch (error: unknown) {
-      setLoading(false);
-
       if (error instanceof Error) {
         toast.error(error.message);
       } else {
         toast.error("An unknown error occurred");
       }
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -98,10 +96,6 @@ export default function LoginPage() {
               {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
-
-          <Separator className="my-6" />
-
-          {/* GOOGLE LOGIN */}
 
           {/* Link to register */}
           <p className="text-center text-sm text-gray-500">
