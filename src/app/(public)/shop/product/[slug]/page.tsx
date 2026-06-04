@@ -9,9 +9,9 @@ import AddToCartSection from "@/components/productDetail/AddToCartSection";
 export default async function ProductPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const { slug } = params;
+  const { slug } = await params;
 
   // Fetch product data
   const productData = await prisma.product.findUnique({

@@ -1,13 +1,15 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface CartItem {
+  cartKey: string; // productId:size:color — unique per variant combination
   productId: string;
   name: string;
   price: number;
   quantity: number;
   imageUrl: string;
-  attributes: string[];
-  discount: string | null;
+  size: string | null;
+  color: string | null;
+  discount: number | null;
 }
 
 interface CartState {
@@ -16,36 +18,33 @@ interface CartState {
   totalQuantity: number;
 }
 
-// ✅ Utility: Load from localStorage
+export function makeCartKey(productId: string, size?: string | null, color?: string | null) {
+  return `${productId}:${size ?? ""}:${color ?? ""}`;
+}
+
 const loadCartFromStorage = (): CartState => {
   try {
-    const storedCart = localStorage.getItem("cart");
-    if (storedCart) return JSON.parse(storedCart);
-  } catch (error) {
-    console.error("Failed to load cart from storage:", error);
+    if (typeof window === "undefined") return { items: [], totalPrice: 0, totalQuantity: 0 };
+    const stored = localStorage.getItem("cart");
+    if (stored) return JSON.parse(stored);
+  } catch {
+    // ignore
   }
   return { items: [], totalPrice: 0, totalQuantity: 0 };
 };
 
-// ✅ Utility: Save to localStorage
 const saveCartToStorage = (state: CartState) => {
   try {
     localStorage.setItem("cart", JSON.stringify(state));
-  } catch (error) {
-    console.error("Failed to save cart to storage:", error);
+  } catch {
+    // ignore
   }
 };
 
-// ✅ Utility function to calculate totals
-const calculateTotals = (items: CartItem[]) => {
-  const totalPrice = items.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
-  const totalQuantity = items.reduce((total, item) => total + item.quantity, 0);
-
-  return { totalPrice, totalQuantity };
-};
+const calculateTotals = (items: CartItem[]) => ({
+  totalPrice: items.reduce((t, i) => t + i.price * i.quantity, 0),
+  totalQuantity: items.reduce((t, i) => t + i.quantity, 0),
+});
 
 const initialState: CartState =
   typeof window !== "undefined"
@@ -56,82 +55,56 @@ const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    addItem: (state, action: PayloadAction<Omit<CartItem, "quantity">>) => {
-      const { productId, name, price, imageUrl, attributes, discount } =
-        action.payload;
-      const existingItem = state.items.find(
-        (item) => item.productId === productId
-      );
+    addItem: (state, action: PayloadAction<Omit<CartItem, "quantity" | "cartKey">>) => {
+      const { productId, size, color } = action.payload;
+      const key = makeCartKey(productId, size, color);
+      const existing = state.items.find((i) => i.cartKey === key);
 
-      if (existingItem) {
-        existingItem.quantity += 1;
+      if (existing) {
+        existing.quantity += 1;
       } else {
-        state.items.push({
-          productId,
-          name,
-          price,
-          imageUrl,
-          quantity: 1,
-          attributes,
-          discount,
-        });
+        state.items.push({ ...action.payload, cartKey: key, quantity: 1 });
       }
 
       const totals = calculateTotals(state.items);
       state.totalPrice = totals.totalPrice;
       state.totalQuantity = totals.totalQuantity;
-
       saveCartToStorage(state);
     },
 
     removeItem: (state, action: PayloadAction<string>) => {
-      state.items = state.items.filter(
-        (item) => item.productId !== action.payload
-      );
+      state.items = state.items.filter((i) => i.cartKey !== action.payload);
       const totals = calculateTotals(state.items);
       state.totalPrice = totals.totalPrice;
       state.totalQuantity = totals.totalQuantity;
-
       saveCartToStorage(state);
     },
 
     decreaseQuantity: (state, action: PayloadAction<string>) => {
-      const existingItem = state.items.find(
-        (item) => item.productId === action.payload
-      );
-
-      if (existingItem) {
-        if (existingItem.quantity > 1) {
-          existingItem.quantity -= 1;
+      const item = state.items.find((i) => i.cartKey === action.payload);
+      if (item) {
+        if (item.quantity > 1) {
+          item.quantity -= 1;
         } else {
-          state.items = state.items.filter(
-            (item) => item.productId !== action.payload
-          );
+          state.items = state.items.filter((i) => i.cartKey !== action.payload);
         }
       }
-
       const totals = calculateTotals(state.items);
       state.totalPrice = totals.totalPrice;
       state.totalQuantity = totals.totalQuantity;
-
       saveCartToStorage(state);
     },
 
     updateQuantity: (
       state,
-      action: PayloadAction<{ productId: string; quantity: number }>
+      action: PayloadAction<{ cartKey: string; quantity: number }>
     ) => {
-      const { productId, quantity } = action.payload;
-      const item = state.items.find((item) => item.productId === productId);
-
-      if (item && quantity > 0) {
-        item.quantity = quantity;
-      }
-
+      const { cartKey, quantity } = action.payload;
+      const item = state.items.find((i) => i.cartKey === cartKey);
+      if (item && quantity > 0) item.quantity = quantity;
       const totals = calculateTotals(state.items);
       state.totalPrice = totals.totalPrice;
       state.totalQuantity = totals.totalQuantity;
-
       saveCartToStorage(state);
     },
 
@@ -139,18 +112,12 @@ const cartSlice = createSlice({
       state.items = [];
       state.totalPrice = 0;
       state.totalQuantity = 0;
-
       saveCartToStorage(state);
     },
   },
 });
 
-export const {
-  addItem,
-  removeItem,
-  decreaseQuantity,
-  updateQuantity,
-  clearCart,
-} = cartSlice.actions;
+export const { addItem, removeItem, decreaseQuantity, updateQuantity, clearCart } =
+  cartSlice.actions;
 
 export default cartSlice.reducer;

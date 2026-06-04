@@ -1,41 +1,30 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
-/**
- * Middleware function to check if a user is authorized
- * Supports role-based access for admin and dashboard routes
- */
 export default withAuth(
   function middleware(req) {
     const { pathname } = req.nextUrl;
-
     const token = req.nextauth.token;
 
-    // Protect admin routes
-    if (pathname.startsWith("/admin")) {
+    // Admin pages and admin API — require ADMIN role
+    const isAdminPath =
+      pathname.startsWith("/admin") || pathname.startsWith("/api/admin");
+
+    if (isAdminPath) {
       if (!token) {
-        // Not logged in → redirect to login
-        const url = req.nextUrl.clone();
-        url.pathname = "/auth/login";
-        return NextResponse.redirect(url);
-      } else if (token.role !== "ADMIN") {
-        // Logged in but not admin → show unauthorized page
-        const url = req.nextUrl.clone();
-        url.pathname = "/unauthorized";
-        return NextResponse.rewrite(url);
+        if (pathname.startsWith("/api/")) {
+          return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+        return NextResponse.redirect(new URL("/auth/login", req.url));
+      }
+      if (token.role !== "ADMIN") {
+        if (pathname.startsWith("/api/")) {
+          return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+        return NextResponse.redirect(new URL("/unauthorized", req.url));
       }
     }
 
-    // Protect dashboard routes (any authenticated user)
-    if (pathname.startsWith("/dashboard")) {
-      if (!token) {
-        const url = req.nextUrl.clone();
-        url.pathname = "/auth/login";
-        return NextResponse.redirect(url);
-      }
-    }
-
-    // Everything else allowed
     return NextResponse.next();
   },
   {
@@ -43,11 +32,20 @@ export default withAuth(
       authorized: ({ token, req }) => {
         const { pathname } = req.nextUrl;
 
-        if (pathname.startsWith("/admin")) {
-          return !!token; // middleware will handle role check
+        // Admin paths: must be logged in (role checked above)
+        if (
+          pathname.startsWith("/admin") ||
+          pathname.startsWith("/api/admin")
+        ) {
+          return !!token;
         }
 
-        if (pathname.startsWith("/dashboard")) {
+        // Customer-only paths
+        if (
+          pathname.startsWith("/checkout") ||
+          pathname.startsWith("/profile") ||
+          pathname.startsWith("/api/orders")
+        ) {
           return !!token;
         }
 
@@ -58,5 +56,11 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/admin/:path*", "/dashboard/:path*"],
+  matcher: [
+    "/admin/:path*",
+    "/checkout/:path*",
+    "/profile/:path*",
+    "/api/admin/:path*",
+    "/api/orders/:path*",
+  ],
 };

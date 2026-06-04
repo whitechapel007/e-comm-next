@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useAppSelector, useAppDispatch } from "@/lib/redux";
 import { RootState } from "@/store";
-import { removeItem, updateQuantity } from "@/store/cartSlice";
+import { removeItem, updateQuantity, CartItem } from "@/store/cartSlice";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +16,12 @@ import { Trash2, ShoppingCart, Tag } from "lucide-react";
 export default function CartPage() {
   const cart = useAppSelector((state: RootState) => state.cart.items);
   const dispatch = useAppDispatch();
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const discountAmount = cart.reduce((sum, item) => {
+    const pct = item.discount ?? 0;
+    return sum + (item.price * item.quantity * pct) / 100;
+  }, 0);
+  const total = subtotal - discountAmount;
 
   if (cart.length === 0)
     return (
@@ -61,9 +66,9 @@ export default function CartPage() {
           animate={{ opacity: 1 }}
           className="lg:col-span-2 space-y-4"
         >
-          {cart.map((item, index) => (
+          {cart.map((item: CartItem, index: number) => (
             <motion.div
-              key={item.productId}
+              key={item.cartKey}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
@@ -76,7 +81,7 @@ export default function CartPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => dispatch(removeItem(item.productId))}
+                    onClick={() => dispatch(removeItem(item.cartKey))}
                     className="text-red-500 hover:bg-red-50"
                     aria-label="Remove item"
                   >
@@ -95,18 +100,19 @@ export default function CartPage() {
                       className="w-20 h-20 rounded-md object-cover border"
                     />
                     <div>
-                      <p className="text-sm text-muted-foreground">
-                        Product ID: {item.productId}
-                      </p>
-                      <p className="font-semibold">${item.price.toFixed(2)}</p>
+                      {item.color && (
+                        <p className="text-sm text-muted-foreground">Color: {item.color}</p>
+                      )}
+                      {item.size && (
+                        <p className="text-sm text-muted-foreground">Size: {item.size}</p>
+                      )}
+                      <p className="font-semibold">₦{item.price.toLocaleString()}</p>
                     </div>
                   </div>
 
                   {/* Quantity */}
                   <div className="flex items-center gap-2">
-                    <label className="text-sm text-muted-foreground">
-                      Qty:
-                    </label>
+                    <label className="text-sm text-muted-foreground">Qty:</label>
                     <Input
                       type="number"
                       min={1}
@@ -114,7 +120,7 @@ export default function CartPage() {
                       onChange={(e) =>
                         dispatch(
                           updateQuantity({
-                            productId: item.productId,
+                            cartKey: item.cartKey,
                             quantity: Number(e.target.value),
                           })
                         )
@@ -128,7 +134,7 @@ export default function CartPage() {
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground">Subtotal</p>
                     <p className="text-lg font-semibold">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      ₦{(item.price * item.quantity).toLocaleString()}
                     </p>
                   </div>
                 </CardContent>
@@ -149,14 +155,16 @@ export default function CartPage() {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="font-semibold">${total.toFixed(2)}</span>
+                <span className="font-semibold">₦{subtotal.toLocaleString()}</span>
               </div>
-              <div className="flex justify-between">
-                <span>Discount (-7%)</span>
-                <span className="text-red-500 font-semibold">
-                  -${(total * 0.07).toFixed(2)}
-                </span>
-              </div>
+              {discountAmount > 0 && (
+                <div className="flex justify-between">
+                  <span>Discount</span>
+                  <span className="text-red-500 font-semibold">
+                    -₦{discountAmount.toLocaleString()}
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span>Delivery</span>
                 <span className="text-green-600 font-medium">Free</span>
@@ -164,7 +172,7 @@ export default function CartPage() {
               <Separator className="my-3" />
               <div className="flex justify-between text-lg font-bold">
                 <span>Total</span>
-                <span>${(total - total * 0.07).toFixed(2)}</span>
+                <span>₦{total.toLocaleString()}</span>
               </div>
             </div>
 

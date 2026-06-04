@@ -1,6 +1,6 @@
-// components/Footer.tsx
 "use client";
 
+import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Facebook, Instagram, Twitter, CreditCard } from "lucide-react";
@@ -9,37 +9,37 @@ export default function Footer() {
   return (
     <footer className="bg-black text-white pt-12 pb-6">
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-10">
-        {/* Company Info Left */}
+        {/* Company Info */}
         <div>
-          <h2 className="mb-4 text-lg font-semibold">Company</h2>
+          <h2 className="mb-4 text-lg font-semibold">VFH Store</h2>
           <p>
             Find a location nearest you.
             <br />
-            see our stores
+            See our stores.
           </p>
-          <p className="mt-4 font-semibold">+8801701253995</p>
-          <p className="text-gray-400">sujon.co@gmail.com</p>
+          <p className="mt-4 font-semibold">+2349050403040</p>
+          <p className="text-gray-400">eboyaboifashionhub@gmail.com</p>
         </div>
 
-        {/* Company Links */}
+        {/* Shop Links */}
         <div>
-          <h2 className="mb-4 text-lg font-semibold">Company</h2>
-          <ul>
-            <li>Shop</li>
-            <li>My account</li>
-            <li>Cart</li>
-            <li>Checkout</li>
+          <h2 className="mb-4 text-lg font-semibold">Shop</h2>
+          <ul className="space-y-2 text-gray-300">
+            <li><Link href="/shop" className="hover:text-white transition-colors">Shop</Link></li>
+            <li><Link href="/profile" className="hover:text-white transition-colors">My account</Link></li>
+            <li><Link href="/cart" className="hover:text-white transition-colors">Cart</Link></li>
+            <li><Link href="/checkout" className="hover:text-white transition-colors">Checkout</Link></li>
           </ul>
         </div>
 
         {/* Services Links */}
         <div>
           <h2 className="mb-4 text-lg font-semibold">Services</h2>
-          <ul>
-            <li>About us</li>
-            <li>Careers</li>
-            <li>Delivery info</li>
-            <li>Privacy policy</li>
+          <ul className="space-y-2 text-gray-300">
+            <li><span className="hover:text-white cursor-pointer transition-colors">About us</span></li>
+            <li><span className="hover:text-white cursor-pointer transition-colors">Careers</span></li>
+            <li><span className="hover:text-white cursor-pointer transition-colors">Delivery info</span></li>
+            <li><span className="hover:text-white cursor-pointer transition-colors">Privacy policy</span></li>
           </ul>
         </div>
 
@@ -80,7 +80,7 @@ export default function Footer() {
         <div className="text-center md:text-right text-2xl italic font-serif mb-2 md:mb-0">
           VFH
         </div>
-        <div className="text-gray-400 text-sm">©2024 by Ebuka reed</div>
+        <div className="text-gray-400 text-sm">©2024 by Ebuka</div>
       </div>
     </footer>
   );

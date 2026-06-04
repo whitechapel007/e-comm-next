@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const { email, amount, orderId } = await req.json();
 
@@ -12,16 +19,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-
     const payload = {
       email,
-      amount: String(amount), // Paystack expects string
+      amount: String(amount),
       reference: `order_${orderId}_${Date.now()}`,
       metadata: { orderId },
     };
 
-    // EXACT equivalent of Paystack's HTTPS request in their docs
-    console.log("secret", process.env.PAYSTACK_SECRET_KEY);
     const response = await fetch(
       "https://api.paystack.co/transaction/initialize",
       {

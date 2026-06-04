@@ -87,7 +87,6 @@ const PhotoSection = ({ data }: { data: ProductType }) => {
             height={530}
             className="w-full h-full object-cover rounded-md hover:scale-110 transition-transform duration-500"
             priority
-            unoptimized
           />
         ) : (
           <div className="flex items-center justify-center w-full h-full text-gray-400">

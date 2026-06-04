@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(perl -i -0pe 's/const Navbar = \\\\\\(\\\\\\) => \\\\{\\\\n  const \\\\{ data: session \\\\} = useSession\\\\\\(\\\\\\);\\\\n  const isAdmin = session\\\\?\\\\.user\\\\?\\\\.role === \"ADMIN\";\\\\n\\\\n  \\\\/\\\\/ Filter menu/const Navbar = \\(\\) => {\\\\n  const { data: session } = useSession\\(\\);\\\\n  const isAdmin = session?.user?.role === \"ADMIN\";\\\\n  const [scrolled, setScrolled] = useState\\(false\\);\\\\n\\\\n  useEffect\\(\\(\\) => {\\\\n    const handleScroll = \\(\\) => setScrolled\\(window.scrollY > 10\\);\\\\n    window.addEventListener\\(\"scroll\", handleScroll, { passive: true }\\);\\\\n    return \\(\\) => window.removeEventListener\\(\"scroll\", handleScroll\\);\\\\n  }, []\\);\\\\n\\\\n  \\\\/\\\\/ Filter menu/' /Users/mac/Documents/development/next/vfh/src/components/layout/header/index.tsx)",
+      "Bash(perl -i -pe 's|<nav className=\"sticky top-0 z-20\">|<nav className={`sticky top-0 z-20 transition-all duration-300 \\\\${scrolled ? \"bg-white/70 backdrop-blur-md shadow-sm\" : \"\"}`}>|' /Users/mac/Documents/development/next/vfh/src/components/layout/header/index.tsx)",
+      "Bash(xargs ls -la)",
+      "Bash(xargs ls)"
+    ]
+  }
+}

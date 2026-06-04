@@ -46,10 +46,11 @@ export default function CheckoutPage() {
     setIsMounted(true);
   }, []);
 
-  const totalAmount = cart.reduce(
+  const subtotal = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
+  const totalAmount = parseFloat((subtotal * 0.93).toFixed(2));
 
   const form = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -71,7 +72,7 @@ export default function CheckoutPage() {
 
     try {
       // Create order
-      const orderRes = await fetch("/api/admin/orders", {
+      const orderRes = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -106,14 +107,11 @@ export default function CheckoutPage() {
       if (typeof window !== "undefined" && window.PaystackPop) {
         const paystack = new window.PaystackPop();
         paystack.resumeTransaction(paymentData.authorization.access_code);
-
-        console.log("here");
       } else {
         setErrorMessage(
           "Payment system not ready. Please refresh and try again."
         );
       }
-      console.log("Payment initialized:", paymentData);
     } catch (err) {
       if (err instanceof Error)
         setErrorMessage(err.message || "Something went wrong during checkout.");

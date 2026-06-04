@@ -3,6 +3,8 @@
 import Link from "next/link";
 import MoblieNav from "./MoblieNav";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 
 import {
   NavigationMenu,
@@ -83,6 +85,13 @@ const data: NavMenu = [
 const Navbar = () => {
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === "ADMIN";
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Filter menu
   const filteredData = data.filter((item) => {
@@ -91,11 +100,9 @@ const Navbar = () => {
   });
 
   return (
-    <nav className="sticky top-0 bg-white z-20">
+    <nav className={`sticky top-0 z-20 transition-all duration-300 ${scrolled ? "bg-white/70 backdrop-blur-md shadow-sm" : ""}`}>
       <div className="flex relative max-w-7xl mx-auto items-center justify-between md:justify-start py-5 md:py-6 px-4 xl:px-0">
-        <Link href="/" className="text-2xl lg:text-4xl mr-3 lg:mr-10">
-          VFH
-        </Link>
+        <Image src="/images/logo.png" alt="" width={100} height={100} />
 
         <div className="block md:hidden mr-4">
           <MoblieNav data={filteredData} />

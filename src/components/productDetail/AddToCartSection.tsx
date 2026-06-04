@@ -29,9 +29,10 @@ const BuyNowBtn = ({ data }: BuyNowBtnProps) => {
         productId: data.id,
         name: data.name,
         imageUrl: currentImage ?? "/placeholder.png",
-        price: data.basePrice,
-        attributes: [selectedColor?.name ?? "", selectedSize ?? ""],
-        discount: String(data.discount ?? 0),
+        price: selectedColor?.price ?? data.basePrice,
+        size: selectedSize ?? null,
+        color: selectedColor?.name ?? null,
+        discount: data.discount ?? null,
       })
     );
 
