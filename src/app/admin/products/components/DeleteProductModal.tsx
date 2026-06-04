@@ -30,7 +30,9 @@ export default function DeleteProductModal({
   const handleDelete = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/products/${productId}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/products/${productId}`, {
+        method: "DELETE",
+      });
       const json = await res.json();
       if (!res.ok) {
         throw new Error(json.error ?? "Failed to delete product");
@@ -39,7 +41,9 @@ export default function DeleteProductModal({
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       onCloseAction();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to delete product");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete product",
+      );
     } finally {
       setLoading(false);
     }

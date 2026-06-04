@@ -29,7 +29,7 @@ export default function ProductTable({
   onPageChange,
 }: ProductTableProps) {
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(
-    null
+    null,
   );
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 

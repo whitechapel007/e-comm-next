@@ -77,7 +77,7 @@ export default function EditProductModal({
           price: v.price,
           inStock: v.inStock,
           images: v.images?.map((i) => ({ url: i.url })) || [],
-        })
+        }),
       ),
       sizes: (product.sizes || []).map((s: Size) => ({
         id: s.id,
@@ -167,7 +167,9 @@ export default function EditProductModal({
       await updateProduct(product.id, data);
       onCloseAction();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to update product");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to update product",
+      );
     } finally {
       setLoading(false);
     }
@@ -202,7 +204,10 @@ export default function EditProductModal({
               </div>
               <div>
                 <Label>Category</Label>
-                <select {...register("category" as const)} className="w-full border rounded-md p-2 h-10">
+                <select
+                  {...register("category" as const)}
+                  className="w-full border rounded-md p-2 h-10"
+                >
                   <option value="KAFTAN">Kaftans</option>
                   <option value="AGBADA">Agbada</option>
                   <option value="SHIRTS">Shirts</option>
@@ -311,7 +316,7 @@ export default function EditProductModal({
                         <Label>Color Name</Label>
                         <Input
                           {...register(
-                            `colorVariants.${index}.colorName` as const
+                            `colorVariants.${index}.colorName` as const,
                           )}
                         />
                       </div>
@@ -320,7 +325,7 @@ export default function EditProductModal({
                         <Input
                           type="color"
                           {...register(
-                            `colorVariants.${index}.colorCode` as const
+                            `colorVariants.${index}.colorCode` as const,
                           )}
                         />
                       </div>

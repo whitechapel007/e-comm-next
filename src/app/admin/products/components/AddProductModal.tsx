@@ -47,7 +47,11 @@ export interface ProductFormValues {
   sizes: { name: string; quantity: string }[];
 }
 
-export default function AddProductModal({ onCloseAction }: { readonly onCloseAction: () => void }) {
+export default function AddProductModal({
+  onCloseAction,
+}: {
+  readonly onCloseAction: () => void;
+}) {
   const [loading, setLoading] = useState(false);
 
   const methods = useForm<ProductFormValues>({
@@ -104,7 +108,9 @@ export default function AddProductModal({ onCloseAction }: { readonly onCloseAct
       reset();
       onCloseAction();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to add product");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to add product",
+      );
     } finally {
       setLoading(false);
     }

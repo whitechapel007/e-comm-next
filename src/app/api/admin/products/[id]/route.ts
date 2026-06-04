@@ -15,14 +15,15 @@ type VariantPayload = {
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
   if (!session?.user) return { error: "Unauthorized", status: 401 } as const;
-  if (session.user.role !== "ADMIN") return { error: "Forbidden", status: 403 } as const;
+  if (session.user.role !== "ADMIN")
+    return { error: "Forbidden", status: 403 } as const;
   return { session };
 }
 
 async function upsertColorVariants(
   tx: Prisma.TransactionClient,
   productId: string,
-  colorVariants: VariantPayload[]
+  colorVariants: VariantPayload[],
 ) {
   const existing = await tx.colorVariant.findMany({
     where: { productId },
@@ -38,10 +39,15 @@ async function upsertColorVariants(
         where: { id: match.id },
         data: { colorCode: variant.colorCode, price, inStock: variant.inStock },
       });
-      await tx.colorVariantImage.deleteMany({ where: { colorVariantId: match.id } });
+      await tx.colorVariantImage.deleteMany({
+        where: { colorVariantId: match.id },
+      });
       if (variant.images?.length) {
         await tx.colorVariantImage.createMany({
-          data: variant.images.map(({ url }) => ({ colorVariantId: match.id, url })),
+          data: variant.images.map(({ url }) => ({
+            colorVariantId: match.id,
+            url,
+          })),
         });
       }
     } else {
@@ -63,7 +69,7 @@ async function upsertColorVariants(
 
 export async function PUT(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
   const auth = await requireAdmin();
   if ("error" in auth) {
@@ -74,8 +80,16 @@ export async function PUT(
 
   try {
     const {
-      name, description, basePrice, prevPrice, discount,
-      isTopSelling, isNewArrival, images, colorVariants, sizes,
+      name,
+      description,
+      basePrice,
+      prevPrice,
+      discount,
+      isTopSelling,
+      isNewArrival,
+      images,
+      colorVariants,
+      sizes,
     } = await req.json();
 
     const product = await prisma.$transaction(async (tx) => {
@@ -84,9 +98,9 @@ export async function PUT(
         data: {
           name,
           description,
-          basePrice:    Number.parseFloat(basePrice),
-          prevPrice:    prevPrice  ? Number.parseFloat(prevPrice)  : null,
-          discount:     discount   ? Number.parseFloat(discount)   : null,
+          basePrice: Number.parseFloat(basePrice),
+          prevPrice: prevPrice ? Number.parseFloat(prevPrice) : null,
+          discount: discount ? Number.parseFloat(discount) : null,
           isTopSelling,
           isNewArrival,
         },
@@ -95,7 +109,10 @@ export async function PUT(
       if (images?.length) {
         await tx.productImage.deleteMany({ where: { productId: id } });
         await tx.productImage.createMany({
-          data: images.map(({ url }: { url: string }) => ({ productId: id, url })),
+          data: images.map(({ url }: { url: string }) => ({
+            productId: id,
+            url,
+          })),
         });
       }
 
@@ -106,20 +123,34 @@ export async function PUT(
       await tx.product.update({
         where: { id },
         data: {
-          sizes: { set: sizes?.length ? sizes.map(({ id: sid }: { id: string }) => ({ id: sid })) : [] },
+          sizes: {
+            set: sizes?.length
+              ? sizes.map(({ id: sid }: { id: string }) => ({ id: sid }))
+              : [],
+          },
         },
       });
 
       return tx.product.findUnique({
         where: { id },
-        include: { images: true, colorVariants: { include: { images: true } }, sizes: true },
+        include: {
+          images: true,
+          colorVariants: { include: { images: true } },
+          sizes: true,
+        },
       });
     });
 
-    return NextResponse.json({ message: "Product updated successfully", product });
+    return NextResponse.json({
+      message: "Product updated successfully",
+      product,
+    });
   } catch (error) {
     console.error("PUT /api/admin/products/[id]:", error);
-    return NextResponse.json({ error: "Failed to update product" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update product" },
+      { status: 500 },
+    );
   }
 }
 
@@ -127,7 +158,7 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
   const auth = await requireAdmin();
   if ("error" in auth) {
@@ -142,7 +173,9 @@ export async function DELETE(
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    const orderItemCount = await prisma.orderItem.count({ where: { productId: id } });
+    const orderItemCount = await prisma.orderItem.count({
+      where: { productId: id },
+    });
     if (orderItemCount > 0) {
       return NextResponse.json(
         {
@@ -150,17 +183,23 @@ export async function DELETE(
             "This product cannot be deleted because it is referenced by existing orders. " +
             "Please archive the product or remove it from orders first.",
         },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
     await prisma.product.delete({ where: { id } });
-    return NextResponse.json({ message: "Product deleted successfully", productId: id });
+    return NextResponse.json({
+      message: "Product deleted successfully",
+      productId: id,
+    });
   } catch (error) {
     console.error("DELETE /api/admin/products/[id]:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to delete product" },
-      { status: 500 }
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to delete product",
+      },
+      { status: 500 },
     );
   }
 }

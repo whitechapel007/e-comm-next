@@ -33,19 +33,21 @@ export default function AdminProductsPage() {
     return () => globalThis.clearTimeout(timer);
   }, [search]);
 
-  const { data, isLoading, isError, error } = useQuery<ProductsResponse, Error>({
-    queryKey: ["admin-products", page, debouncedSearch],
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      params.set("page", String(page));
-      params.set("limit", String(limit));
-      if (debouncedSearch) params.set("search", debouncedSearch);
+  const { data, isLoading, isError, error } = useQuery<ProductsResponse, Error>(
+    {
+      queryKey: ["admin-products", page, debouncedSearch],
+      queryFn: async () => {
+        const params = new URLSearchParams();
+        params.set("page", String(page));
+        params.set("limit", String(limit));
+        if (debouncedSearch) params.set("search", debouncedSearch);
 
-      const res = await fetch(`/api/admin/products?${params.toString()}`);
-      if (!res.ok) throw new Error("Failed to load products");
-      return res.json();
+        const res = await fetch(`/api/admin/products?${params.toString()}`);
+        if (!res.ok) throw new Error("Failed to load products");
+        return res.json();
+      },
     },
-  });
+  );
 
   const products = data?.products ?? [];
   const totalPages = data?.totalPages ?? 1;
@@ -75,7 +77,9 @@ export default function AdminProductsPage() {
 
           <Button
             variant="outline"
-            onClick={() => queryClient.invalidateQueries({ queryKey: ["admin-products"] })}
+            onClick={() =>
+              queryClient.invalidateQueries({ queryKey: ["admin-products"] })
+            }
             className="flex items-center gap-2"
           >
             <RefreshCcw className="h-4 w-4" />
@@ -106,7 +110,9 @@ export default function AdminProductsPage() {
       </div>
 
       {isLoading && (
-        <p className="text-center text-sm text-gray-500">Loading products, please wait...</p>
+        <p className="text-center text-sm text-gray-500">
+          Loading products, please wait...
+        </p>
       )}
 
       {isError && (
