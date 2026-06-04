@@ -32,13 +32,12 @@ function RatingBar({ star, count, pct }: { star: number; count: number; pct: num
 }
 
 interface ReviewsContentProps {
-  productId: string;
   productSlug: string;
 }
 
 const LIMIT = 6;
 
-const ReviewsContent = ({ productId: _, productSlug }: Readonly<ReviewsContentProps>) => {
+const ReviewsContent = ({ productSlug }: Readonly<ReviewsContentProps>) => {
   const queryClient = useQueryClient();
   const [sort, setSort]             = useState("latest");
   const [page, setPage]             = useState(1);

@@ -41,7 +41,7 @@ const Tabs = ({ product }: Readonly<TabsProps>) => {
       </div>
       <div className="mb-12 sm:mb-16">
         {active === 1 && <ProductDetailsContent product={product} />}
-        {active === 2 && <ReviewsContent productId={product.id} productSlug={product.slug} />}
+        {active === 2 && <ReviewsContent productSlug={product.slug} />}
       </div>
     </div>
   );

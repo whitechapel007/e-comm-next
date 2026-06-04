@@ -5,13 +5,10 @@ import { signIn } from "next-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
-
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
