@@ -24,6 +24,13 @@ const Home = async () => {
     }),
   ]);
 
+  // Prisma returns Date objects; serialize to strings for client components
+  const serializedReviews = latestReviews.map((r) => ({
+    ...r,
+    createdAt: r.createdAt.toISOString(),
+    updatedAt: r.updatedAt.toISOString(),
+  }));
+
   return (
     <div className="min-h-screen bg-white text-slate-900">
       <Hero />
@@ -45,7 +52,7 @@ const Home = async () => {
           story starts here.
         </p>
       </section>
-      <ReviewsCarousel reviews={latestReviews} />
+      <ReviewsCarousel reviews={serializedReviews} />
     </div>
   );
 };
