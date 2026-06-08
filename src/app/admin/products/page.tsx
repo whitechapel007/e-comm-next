@@ -54,7 +54,7 @@ export default function AdminProductsPage() {
   const isEmpty = !isLoading && products.length === 0;
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
+    <div className="max-w-7xl mx-auto  space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-semibold">Manage Products</h1>
