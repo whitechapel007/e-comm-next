@@ -175,7 +175,7 @@ export default function ProductForm({
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="space-y-6 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 shadow-sm">
             <div className="space-y-3">
               <div className="flex flex-col gap-2">
                 <h2 className="text-2xl font-semibold">
@@ -326,7 +326,7 @@ export default function ProductForm({
             </div>
           </div>
 
-          <div className="space-y-6 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="space-y-6 rounded-3xl border border-gray-200 bg-white p-4 shadow-sm">
             <div className="space-y-3">
               <h3 className="text-lg font-semibold">
                 Variant and stock details

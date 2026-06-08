@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 
 export default function NewProductPage() {
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto p-6 space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-medium text-sky-600">Admin • Products</p>
@@ -23,7 +23,7 @@ export default function NewProductPage() {
         </Button>
       </div>
 
-      <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-3xl border border-gray-200 bg-white p-4 shadow-sm">
         <ProductForm mode="create" />
       </div>
     </div>

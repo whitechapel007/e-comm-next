@@ -91,7 +91,7 @@ export default async function EditProductPage({
         </Button>
       </div>
 
-      <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="rounded-3xl border border-gray-200 bg-white p-4 shadow-sm">
         <ProductForm
           mode="edit"
           productId={params.id}
